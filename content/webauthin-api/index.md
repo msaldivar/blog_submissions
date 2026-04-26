@@ -93,3 +93,27 @@ The step-by-step flow looks like this:
 
 Origin binding happens at step 3. The browser automatically includes the current origin in the data sent to the authenticator. If a user is on a phishing site at `evil-example.com`, the authenticator will not find a credential registered for that origin. The authentication fails silently, with no secret exposed to the attacker.
 
+## WebAuthn Spec and Browser Support
+
+### The W3C Specification
+
+The WebAuthn standard has matured through three specification levels. [Level 1](https://www.w3.org/TR/webauthn-1/) became a W3C Recommendation in March 2019, establishing the core API for credential creation and assertion. [Level 2](https://www.w3.org/TR/webauthn-2/) followed in April 2021, adding support for cross-platform authenticator transports, improved attestation handling, and better alignment with the CTAP2 protocol. [Level 3](https://www.w3.org/TR/webauthn-3/) reached Candidate Recommendation status in January 2026 and introduces features like the PRF extension for deriving encryption keys from credentials, conditional mediation (the ability to autofill passkey prompts), and the Signal API for relying parties to communicate credential state changes back to authenticators.
+
+Each level builds on the previous one without breaking backward compatibility. If your application targets Level 2 features today, it will continue to work as Level 3 gains full browser adoption.
+
+### Browser Compatibility and Secure Contexts
+
+WebAuthn enjoys broad support across modern browsers. Chrome has supported it since version 67, Firefox since version 60, Edge since version 18, and Safari since version 13. On mobile, both Android (via Chrome and the platform credential manager) and iOS (via Safari with Face ID and Touch ID) provide full WebAuthn support. The practical result is that the vast majority of users on current browsers can use WebAuthn credentials without installing anything.
+
+One hard requirement: WebAuthn only works in [secure contexts](https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts). That means HTTPS in production, no exceptions. The API will not execute over plain HTTP. For local development, `localhost` is treated as a secure context by browsers, so you can test without configuring TLS certificates on your dev machine. This requirement exists because origin binding is the foundation of WebAuthn's phishing resistance, and origin verification is only meaningful over authenticated connections.
+
+Browser support is not perfectly uniform across every feature. Platform authenticator availability depends on the operating system (Windows Hello, macOS Touch ID, Android biometrics), and newer Level 3 extensions like PRF are still rolling out across browsers and platforms. Implement feature detection using `PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()` and provide graceful fallbacks for users on older configurations.
+
+### From U2F to WebAuthn
+
+WebAuthn did not appear in a vacuum. It evolved from FIDO U2F (Universal 2nd Factor), a protocol the FIDO Alliance introduced in 2014 for hardware-based second-factor authentication. U2F was effective but limited: it only functioned as a second factor alongside a password, it required a physical USB security key, and it never saw native Safari support.
+
+WebAuthn addresses each of those limitations. It supports both multi-factor and single-factor (passwordless) authentication, so a fingerprint scan or security key tap can replace passwords entirely rather than just supplementing them. It works with platform authenticators built into devices, not only roaming USB keys. And it has universal browser adoption, something U2F never achieved.
+
+The transition is effectively complete. Chrome deprecated the U2F JavaScript API in version 98 and removed it entirely in version 115. Firefox deprecated U2F in favor of WebAuthn starting with version 60. Existing U2F security keys remain compatible with WebAuthn through CTAP1 backward compatibility, so users with older YubiKeys or Google Titan keys do not need to replace their hardware. For new implementations, WebAuthn through the FIDO2 framework is the only standard worth building on.
+
