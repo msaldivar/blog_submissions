@@ -1,15 +1,15 @@
 ---
-title: "SAML vs SSO: What's the Difference, How They Work Together, and Which One You Actually Need"
+title: "SAML vs. SSO: What's the Difference, How They Work Together, and Which One You Actually Need"
 date: "2026-05-22"
-description: "SAML and SSO aren't the same thing. Learn the key differences, how SAML-based SSO works step by step, when to use SAML vs OIDC, and how to implement it with SuperTokens."
+description: "SAML and SSO aren't the same thing. Learn the key differences, how SAML-based SSO works step by step, when to use SAML vs. OIDC, and how to implement it with SuperTokens."
 cover: "saml-vs-sso.png"
 category: "programming"
 author: "Mostafa Ibrahim"
 ---
 
-A common moment in B2B SaaS engineering: an enterprise prospect declares that they require "SAML SSO" before signing the contract. The documentation that follows is dense with XML schemas, OASIS specifications, and a stack of acronyms (SP, IdP, ACS, AuthnRequest, SLO). The question of what to actually build, and whether SAML is even the right call versus an existing OIDC integration, gets lost in the terminology.
+A common moment in B2B SaaS engineering: an enterprise prospect declares that they require "SAML SSO" before signing the contract. The documentation that follows is dense with XML schemas, OASIS specifications, and a stack of acronyms (SP, IdP, ACS, AuthnRequest, SLO). The question of what to actually build and whether SAML is even the right call, instead of using an existing OIDC integration, gets lost in the terminology.
 
-This article is written for backend and full-stack engineers at B2B SaaS companies who need to add enterprise SSO to unblock a deal. The goal is to make the underlying protocols legible without reverse-engineering them from vendor docs.
+This article is written for backend and full-stack engineers at B2B SaaS companies who need to add enterprise SSO to unblock a deal. The goal is to make the underlying protocols legible, without reverse-engineering them from vendor docs.
 
 The single most important sentence to internalize:
 
@@ -23,19 +23,19 @@ Everything else in this article follows from that distinction.
 
 The mechanics are conceptually simple:
 
-1. An **Identity Provider (IdP)** authenticates the user once
-2. The IdP issues a signed token or assertion proving the user's identity
-3. **Service Providers (SPs)**, the actual applications the user wants to use, trust that signature and grant access without asking for credentials again
+1. An **Identity Provider (IdP)** authenticates the user once.
+2. The IdP issues a signed token or assertion proving the user's identity.
+3. **Service Provider (SP)**, the actual application the user wants to use, trusts that signature and grants access without asking for credentials again.
 
 Consumer SSO is familiar from daily life. Logging into Google grants access to Gmail, Drive, Calendar, and YouTube under a single session. The B2B version is structurally identical, but the IdP is a corporate identity platform. A marketing analyst at a Fortune 500 logs into Okta once in the morning, and from that single session can launch Salesforce, Slack, Workday, Zoom, and the SaaS product being purchased, without typing another password.
 
 That second example is the one that matters for revenue. When an enterprise IT team states an SSO requirement, the meaning is specific: employees should be able to access the product through the corporate identity platform, with offboarding, access reviews, and audit logs flowing through the same system that handles every other application. That is the requirement. SAML is one way to fulfill it. OIDC is another.
 
-The benefits stack quickly: one set of credentials to rotate, MFA enforced centrally, instant deprovisioning when an employee leaves, and a single audit log to satisfy compliance. These benefits do not come from SAML specifically. They come from SSO as an architecture. SAML is just the message format that some enterprises happen to insist on.
+The benefits stack quickly: one set of credentials to rotate, MFA enforced centrally, instant deprovisioning when an employee leaves, and a single audit log to satisfy compliance. These benefits do not come from SAML specifically &mdash; they come from SSO as an architecture. SAML is just the message format that some enterprises happen to insist on.
 
 ## What is SAML?
 
-[SAML (Security Assertion Markup Language)](https://supertokens.com/blog/demystifying-saml) is an open XML-based standard for exchanging authentication and authorization data between an Identity Provider and a Service Provider. SAML 2.0, [ratified as an OASIS Standard in March 2005](https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf), is the version meant whenever "SAML" is discussed today. SAML 1.1 still exists in legacy environments, but new integrations should never be built against it.
+[Security Assertion Markup Language (SAML)](https://supertokens.com/blog/demystifying-saml) is an open XML-based standard for exchanging authentication and authorization data between an Identity Provider and a Service Provider. SAML 2.0, [ratified as an OASIS Standard in March 2005](https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf), is the version meant whenever SAML is discussed today. SAML 1.1 still exists in legacy environments, but new integrations should never be built against it.
 
 SAML has three core building blocks worth understanding before any code gets written:
 
@@ -47,7 +47,7 @@ Trust between the SP and IdP is established through metadata exchange: an XML fi
 
 The major SAML IdPs encountered in enterprise integrations are Microsoft Entra ID (formerly Azure AD), Okta, Google Workspace, Ping Identity, OneLogin, and Active Directory Federation Services (ADFS). When an enterprise customer states a SAML SSO requirement, one of these is almost certainly the IdP in use.
 
-## SAML vs SSO: the core distinction
+## SAML vs. SSO: The Core Distinction
 
 ![SAML-vs-SSO](SAML-vs-SSO.png)
 
@@ -57,21 +57,21 @@ A comparison table makes the asymmetry explicit:
 
 ||**SSO**|**SAML**|
 |---|---|---|
-|**What it is**|An authentication strategy or goal|An open protocol / message format|
-|**What it defines**|The user experience of "one login, many apps"|The structure and exchange of identity messages|
-|**Existence**|Can be implemented without SAML, using OIDC, Kerberos, or proprietary protocols|Only makes sense in the context of SSO|
-|**Governance**|Determined by architecture and product choices|Governed by the OASIS open standard|
-|**Typical context**|Any multi-application environment|Enterprise B2B, federated identity, legacy systems|
+|**What it is**|An authentication strategy or goal.|An open protocol / message format.|
+|**What it defines**|The user experience of "one login, many apps."|The structure and exchange of identity messages.|
+|**Existence**|Can be implemented without SAML, by using OIDC, Kerberos, or proprietary protocols.|Only makes sense in the context of SSO.|
+|**Governance**|Determined by architecture and product choices.|Governed by the OASIS open standard.|
+|**Typical context**|Any multi-application environment.|Enterprise B2B, federated identity, legacy systems.|
 
 The takeaway: **not all SSO is SAML, but all SAML is SSO.** A competitor's homepage that says "this product supports SSO" reveals nothing about which protocol is implemented. A claim of "SAML SSO" support is specific. It means the product speaks the XML-based OASIS standard that enterprise IT teams expect.
 
 So the next question is the one that actually matters: how does SAML implement SSO in practice?
 
-## How SAML SSO works, step by step
+## How SAML SSO Works, Step By Step
 
 SAML SSO has two flows. Both will eventually need to be supported. Understanding one well first is the path to handling both.
 
-### **SP-initiated flow (the common case)**
+### **SP-Initiated Flow (The Common Case)**
 
 ![SP-Initiated-SAML-Flow](SP-Initiated-SAML-Flow.png)
 
@@ -82,24 +82,24 @@ This is the flow that runs when a user clicks "Log in" on the application:
 3. **The IdP authenticates the user** through whatever mechanism it controls: password, MFA, hardware key, certificate, or any combination.
 4. **The IdP builds a signed SAML assertion** containing the user's identity and attributes, wrapped in a `<Response>` element.
 5. **The IdP POSTs the response** to the application's **Assertion Consumer Service (ACS) URL**, a specific endpoint on the backend whose only job is to receive SAML responses. This step uses the HTTP-POST binding; the browser auto-submits a form containing the base64-encoded SAML response.
-6. **The application validates the response.** It checks the XML signature against the IdP's public certificate (from the metadata configured during setup), validates the `NotBefore` and `NotOnOrAfter` timestamps, confirms the `Audience` matches the application's entity ID, and checks the `InResponseTo` attribute matches the original `AuthnRequest`.
+6. **The application validates the response.** It checks the XML signature against the IdP's public certificate (from the metadata configured during setup), validates the `NotBefore` and `NotOnOrAfter` timestamps, confirms the `Audience` matches the application's entity ID, and verfies the `InResponseTo` attribute matches the original `AuthnRequest`.
 7. **The application creates a session** and grants the user access.
 
-### **IdP-initiated flow**
+### **IdP-Initiated Flow**
 
 The second flow starts at the IdP instead of the application. The user logs into the Okta dashboard, sees a tile for the application, clicks it, and the IdP pushes a SAML response to the ACS URL without any prior `AuthnRequest`.
 
 This is the flow that powers the "app launcher" tiles enterprise users see inside Okta or Entra ID portals. It is also the flow that quietly creates the most security headaches, because there is no `AuthnRequest` to bind the response to. The application receives an unsolicited assertion and has to decide whether to trust it. **This is a real attack surface.** Without an `InResponseTo` value to validate against, the only defenses are signature, audience, and replay protection. The mistakes section below covers this in more detail.
 
-### **Single Logout (SLO)**
+### **Single Logout**
 
 A question every enterprise customer will eventually ask: *"When a user logs out of Okta, do they get logged out of the application too?"*
 
-SLO is the SAML protocol designed to answer "yes." When the user signs out at the IdP, the IdP sends a `<LogoutRequest>` to every SP that has an active session, and each SP terminates its local session. In theory, the user is logged out everywhere at once.
+Single Logout (SLO) is the SAML protocol designed to answer "yes." When the user signs out at the IdP, the IdP sends a `<LogoutRequest>` to every SP that has an active session, and each SP terminates its local session. In theory, the user is logged out everywhere simultaneously.
 
 In practice, SLO is one of the messiest parts of SAML. Implementations vary widely between IdPs. Some send LogoutRequests synchronously and wait for responses, others fire and forget. Browser session state, cookies, and back-channel versus front-channel logout each behave differently. Most B2B SaaS teams ship SP-initiated SSO first and defer SLO until an enterprise customer files a security review finding about it. That is a defensible sequence, but the conversation is coming. Not implementing SLO means a user who logs out of an IdP can still walk back into the application on the same browser if the session cookie is alive.
 
-## SAML vs OIDC vs OAuth: the full protocol picture
+## SAML vs. OIDC vs. OAuth: The Full Protocol Picture
 
 ![SAML-vs-OIDC-vs-OAuth](SAML-vs-OIDC-vs-OAuth.png)
 
@@ -111,7 +111,7 @@ This is where most developers get confused, and where most competitor articles w
 - **OpenID Connect (OIDC)** is an authentication layer built on top of OAuth 2.0. The [OpenID Connect Core 1.0 specification](https://openid.net/specs/openid-connect-core-1_0.html) describes it as "a simple identity layer on top of the OAuth 2.0 protocol." OIDC adds an **ID Token**, a JWT containing identity claims signed by the IdP, plus a userinfo endpoint and a discovery mechanism (`.well-known/openid-configuration`). When developers casually say "OAuth login," the actual protocol is almost always OIDC.
 - **SAML 2.0** is an XML-based authentication protocol designed for browser-based [enterprise SSO](https://supertokens.com/blog/enterprise-sso). It predates OIDC by nearly a decade.
 
-So the question of whether to use [OAuth or SAML](https://supertokens.com/blog/saml-vs-oauth) for login is malformed. OAuth alone should not be doing login. The real comparison is [OIDC versus SAML](https://supertokens.com/blog/oidc-vs-saml), and here is how the two stack up:
+So the question of whether to use [OAuth or SAML](https://supertokens.com/blog/saml-vs-oauth) for login is malformed. OAuth alone should not be doing login. The real comparison is [OIDC vs. SAML](https://supertokens.com/blog/oidc-vs-saml), and here is how the two stack up:
 
 ||**SAML 2.0**|**OIDC**|**OAuth 2.0**|
 |---|---|---|---|
@@ -124,20 +124,20 @@ So the question of whether to use [OAuth or SAML](https://supertokens.com/blog/s
 |**Developer experience**|Complex; XML, certificates, profiles|Familiar; JSON, JWTs, discovery URLs|Familiar|
 |**Discovery**|Static metadata XML exchange|Dynamic .well-known endpoint|N/A|
 
-Two practical observations the table does not capture.
+There are two practical observations the table does not capture.
 
 First: **SAML and OIDC are not competitors.** Most B2B SaaS products at scale support both. New consumer-facing apps default to OIDC because mobile, SPAs, and API-first architectures work better with JSON and JWTs than with browser-bound XML POSTs. The moment a customer's procurement team starts asking about identity requirements, the answer involves SAML, because that is what their existing IT stack speaks. The realistic question is rarely "OIDC or SAML?" The question is "OIDC first, then SAML when the first enterprise deal closes."
 
 Second: **OAuth alone is not a login system.** This point cannot be repeated often enough. If an "OAuth login" is actually doing authentication, it is doing so via OIDC under the hood (by consuming the ID token), or it is doing so incorrectly (by using an access token to identify the user, which has the wrong audience and no defined identity claims). The [Auth0 protocol documentation](https://auth0.com/docs/authenticate/protocols/openid-connect-protocol) puts it cleanly: OAuth 2.0 is about resource access, OIDC is about user authentication.
 
-## When to use SAML vs OIDC: a decision framework
+## When To Use SAML vs. OIDC: A Decision Framework
 
 Most articles dodge this section. Here is the opinionated version.
 
 **Use SAML when:**
 
 - An enterprise customer's IT team explicitly requires it. Okta, Entra ID, Ping, and ADFS all support both protocols, but procurement checklists frequently still mandate SAML by name.
-- Integration with legacy on-prem enterprise systems is required (older HR platforms, ERPs, SAP, Oracle products) and those systems only speak SAML.
+- Integration with legacy on-premises enterprise systems is required (older HR platforms, ERPs, SAP, Oracle products) and those systems only speak SAML.
 - The customer needs attribute-based access control driven by SAML attribute assertions (group memberships, department codes, employee classifications).
 - The compliance environment (FedRAMP, certain HIPAA configurations, defense-adjacent work) expects federated identity with auditable XML assertions.
 
@@ -155,7 +155,7 @@ Most articles dodge this section. Here is the opinionated version.
 
 The shortest version of the decision: ship OIDC for the default flow, and treat SAML as a per-tenant extension that gets enabled when an enterprise customer requires it. Resist the temptation to make every customer use SAML, and resist the temptation to ask enterprise prospects to switch to OIDC because it would be easier on the engineering side.
 
-## Common SAML SSO implementation mistakes
+## Common SAML SSO Implementation Mistakes
 
 These are the failure modes that burn engineering time on the first SAML integration. Most have known mitigations. Knowing they exist before they surface as customer-facing failures is the goal of this section.
 
@@ -167,7 +167,7 @@ These are the failure modes that burn engineering time on the first SAML integra
 
 **4. Missing or rigid attribute mappings.** Enterprise IdPs send user attributes under wildly non-standard claim names. Okta might send `email`, Entra ID might send `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`, and a custom Ping deployment might send `urn:oid:0.9.2342.19200300.100.1.3`. Build an attribute mapping layer that allows configuring which IdP attribute maps to which user field per tenant. Hardcoding a single attribute name will fail on the first non-Okta customer.
 
-**5. Trusting IdP-initiated flows without InResponseTo validation.** By design, IdP-initiated SAML has no `AuthnRequest` to bind the response to, which removes one of the protocol's strongest replay defenses. When accepting IdP-initiated assertions, validation must be aggressive: signature, audience, recipient, NotOnOrAfter, and a one-time-use check to prevent replay. Many security teams disable IdP-initiated entirely as a result. Make that choice consciously, not by default.
+**5. Trusting IdP-initiated flows without InResponseTo validation.** By design, IdP-initiated SAML has no `AuthnRequest` to bind the response to, and this removes one of the protocol's strongest replay defenses. When accepting IdP-initiated assertions, validation must be aggressive: signature, audience, recipient, NotOnOrAfter, and a one-time-use check to prevent replay. Many security teams disable IdP-initiated entirely as a result. Make that choice consciously, not by default.
 
 **6. Skipping Single Logout entirely.** Skipping SLO is a defensible early-stage choice. Never planning to add it is not. Enterprise security questionnaires routinely require it, and "no SLO support" can become a deal-blocker after the technical integration is otherwise complete.
 
@@ -198,7 +198,7 @@ Once Jackson is running, a tenant's SAML connection gets registered by posting t
 
 The [SuperTokens enterprise SAML integration guide](https://supertokens.com/docs/authentication/enterprise/saml) walks through the full setup including multi-tenancy. The short version: each enterprise customer becomes a SuperTokens tenant, each tenant gets its own SAML connection in Jackson, and the same SuperTokens session layer handles users from every protocol.
 
-If you're still evaluating which SSO provider to build on, [this comparison of open source SSO providers](https://supertokens.com/blog/sso-providers) covers the main options. For teams that have landed on SuperTokens: it supports both modern OIDC (native) and SAML (via Jackson) under a unified multi-tenant session layer, is open source and self-hostable so there is no vendor lock-in, and works with the SAML IdPs enterprise customers actually use: Entra ID, Okta, Google Workspace, ADFS, Ping, OneLogin, JumpCloud, and Rippling.
+If you're still evaluating which SSO provider to build on, [this comparison of open source SSO providers](https://supertokens.com/blog/sso-providers) covers the main options. For teams that have landed on SuperTokens: it supports both modern OIDC (native) and SAML (via Jackson) under a unified multi-tenant session layer, is open source and self-hostable, so there is no vendor lock-in, and works with the SAML IdPs enterprise customers actually use: Entra ID, Okta, Google Workspace, ADFS, Ping, OneLogin, JumpCloud, and Rippling.
 
 ## FAQ
 
@@ -220,9 +220,9 @@ A signed XML document issued by the IdP that proves a user's identity to a Servi
 
 ### **What is the difference between SP-initiated and IdP-initiated SSO?**
 
-**SP-initiated:** the user starts at the application, the application redirects them to the IdP with an `AuthnRequest`, the IdP authenticates and sends back a response. This is the common case.
+**SP-initiated:** The user starts at the application, the application redirects them to the IdP with an `AuthnRequest`, the IdP authenticates and sends back a response. This is the common case.
 
-**IdP-initiated:** the user is already logged into the IdP dashboard, clicks a tile for the application, and the IdP pushes an unsolicited assertion to the ACS URL. Convenient, but riskier because there is no `AuthnRequest` to validate against.
+**IdP-initiated:** The user is already logged into the IdP dashboard, clicks a tile for the application, and the IdP pushes an unsolicited assertion to the ACS URL. Convenient, but riskier because there is no `AuthnRequest` to validate against.
 
 ### **Does SuperTokens support SAML?**
 
