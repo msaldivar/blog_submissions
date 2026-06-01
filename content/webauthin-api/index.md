@@ -462,5 +462,81 @@ Once a user has registered a passkey, you can offer it as the default login meth
 
 In SuperTokens specifically, this layering is handled by combining the WebAuthn recipe with your existing first-factor recipe, and optionally with the [MFA recipe](https://supertokens.com/docs/additional-verification/mfa/webauthn-setup) when you want WebAuthn enforced as a second factor for specific users or roles. The migration becomes a configuration and UX exercise rather than a rewrite of your auth layer.
 
-<!-- Section word count: 642 -->
-<!-- Total word count: 3,593 -->
+## Common Pitfalls, Security Considerations, and Best Practices
+
+WebAuthn removes entire categories of attack, but it introduces operational details that are easy to get wrong. The failures here are rarely cryptographic. They show up in attestation handling, credential lifecycle management, and error states that leave users stranded.
+
+### Attestation, Consent, and Extensions
+
+Attestation is the most commonly over-engineered part of a WebAuthn integration. It lets you verify the make and model of an authenticator, but most applications do not need it. Requesting `attestation: "direct"` pulls back identifying information about the user's device, which raises privacy concerns and adds verification complexity you have to maintain. Unless you operate in a regulated environment that mandates specific hardware (FIPS-validated keys, for example), set `attestation: "none"`. This respects user privacy and simplifies your server logic without weakening the core security guarantee.
+
+User consent is built into the protocol through user presence and user verification. User presence (a touch or tap) confirms a human is physically present. User verification (biometric or PIN) confirms it is the right human. Set `userVerification: "preferred"` for most flows so the authenticator uses verification when available without hard-failing on devices that lack it. Reserve `"required"` for sensitive operations where you cannot accept presence alone.
+
+Extensions like the PRF extension (for deriving encryption keys) or `credProps` (for learning whether a credential is discoverable) are powerful but unevenly supported. Treat them as enhancements, not dependencies, and always check the extension results rather than assuming they were honored.
+
+### Key Rotation and Credential Revocation
+
+WebAuthn credentials do not expire on their own, so revocation is your responsibility. Build a credential management interface where users can view their registered authenticators and remove ones they no longer control. When a user reports a lost device, revoking the corresponding credential should immediately invalidate it server-side by deleting the stored public key.
+
+There is no "rotating" a WebAuthn private key the way you rotate a password, because the key never leaves the authenticator. Rotation in practice means registering a new credential and revoking the old one. Encourage users to register a replacement before removing an old authenticator so they never drop to zero registered credentials.
+
+### Multi-Device Registration
+
+A single registered authenticator is a single point of failure. If it is the only credential and the device is lost, the user is locked out. Make multi-device registration a deliberate part of onboarding: after a user registers their first credential, prompt them to add a second (a phone passkey alongside a laptop sensor, or a backup security key). Store credentials in a one-to-many relationship with the user, and let users assign friendly names so they can tell their devices apart when managing them later.
+
+Synced passkeys (backed up through iCloud Keychain or Google Password Manager) reduce this risk because the credential follows the user across their devices. Device-bound credentials like hardware security keys do not sync, so backup registration matters more for those.
+
+### Error Handling
+
+WebAuthn surfaces failures as `DOMException` types, and handling them gracefully separates a usable flow from a frustrating one.
+
+```javascript
+try {
+  const credential = await navigator.credentials.get({ publicKey: options });
+  // verify on server
+} catch (err) {
+  switch (err.name) {
+    case 'NotAllowedError':
+      // User canceled or the operation timed out
+      showMessage('Authentication canceled. Try again or use another method.');
+      break;
+    case 'InvalidStateError':
+      // Credential already registered on this device (during create)
+      showMessage('This device is already registered.');
+      break;
+    case 'NotSupportedError':
+      // Requested parameters not supported
+      offerFallbackMethod();
+      break;
+    case 'SecurityError':
+      // Origin or RP ID mismatch
+      logSecurityEvent(err);
+      break;
+    default:
+      offerFallbackMethod();
+  }
+}
+```
+
+`NotAllowedError` is the one you will see most. It covers both user cancellation and timeouts, so do not treat it as an attack signal. Give the user a clear path to retry or fall back. Authenticator removal mid-flow (unplugging a security key) also surfaces here. Always pair a timeout value with a fallback option so a stalled prompt never becomes a dead end.
+
+### Phishing Resistance Is Not Automatic Configuration Safety
+
+Origin binding is what makes WebAuthn phishing-resistant: a credential registered for `example.com` cannot be used on `evil-example.com`, because the browser includes the real origin in the signed data and the authenticator will not match credentials across origins. A credential captured by a phishing site is useless because it was never issued for that origin in the first place.
+
+That protection depends on configuring your relying party ID and expected origin correctly. The most common self-inflicted wound is loose origin validation on the server. Never derive your expected origin from the incoming request's `Origin` header, because an attacker controls that value. Hardcode your allowed origins or load them from server configuration, and validate strictly.
+
+```javascript
+// WRONG: trusting attacker-controlled input
+expectedOrigin: req.headers.origin
+
+// CORRECT: server-defined allowlist
+const ALLOWED_ORIGINS = process.env.NODE_ENV === 'production'
+  ? ['https://example.com']
+  : ['http://localhost:3000'];
+```
+
+A mismatched or overly broad relying party ID (allowing wildcard subdomains, for instance) can also create silent failures or widen your attack surface. Set the RP ID to the registrable domain you actually serve, test it against your real origin, and resist the urge to loosen it to make a misconfiguration "work."
+
+<!-- Section word count: 808 -->
+<!-- Total word count: 4,401 -->
