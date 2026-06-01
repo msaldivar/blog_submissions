@@ -573,6 +573,10 @@
         "location": "https://supertokens.com/blog/self-hosted-auth-solutions-in-2026"
     },
     {
+<<<<<<< HEAD
         "location": "https://supertokens.com/blog/evergreen-hosting-announcement"
+=======
+        "location": "https://supertokens.com/blog/webauthin-api"
+>>>>>>> 1dcf18d (add metadata)
     }
 ]
