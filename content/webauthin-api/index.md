@@ -589,3 +589,38 @@ Yes. WebAuthn supports both single-factor (passwordless) and second-factor use. 
 
 It depends on the type of credential. Synced passkeys are backed up to your platform account (iCloud or Google), so they are recoverable on a new device by signing back into that account. Device-bound credentials, like hardware security keys, are not recoverable; the private key is gone with the device. This is why backup matters. A well-designed implementation prompts you to register a second credential at enrollment and provides recovery codes, so losing one authenticator never means losing access to your account. If you do lose your only credential with no backup, you fall back to the application's account recovery process, which should require out-of-band identity verification.
 
+## Getting Started
+
+WebAuthn looks complex from the spec, but adding it to a real application is mostly a matter of choosing the right tools and wiring them in. You do not need to implement CBOR parsing or signature verification yourself. Here is the fastest path from reading to shipping.
+
+### Pick a Library
+
+If you are building the flow directly, [`@simplewebauthn`](https://github.com/MasterKale/SimpleWebAuthn) is the most widely used option in the JavaScript ecosystem. It provides `@simplewebauthn/server` for backend verification and `@simplewebauthn/browser` for the frontend, handling the encoding and cryptographic work described earlier in this guide. For other stacks, the [FIDO Alliance maintains a list](https://fidoalliance.org/certification/fido-certified-products/) of certified server libraries.
+
+If you would rather not manage the auth layer at all, use a framework that ships WebAuthn as a configurable component. [SuperTokens](https://supertokens.com/docs/authentication/passkeys/initial-setup) provides passkey support as a recipe in its Node.js and Python SDKs. Enabling it is a matter of adding `WebAuthn.init()` to your backend and frontend `recipeList`, as shown earlier. Because it is open source, you keep full visibility into the backend logic with no vendor lock-in, and you can self-host the core if you need to.
+
+### Add WebAuthn to Your Existing Auth
+
+You do not have to rebuild your login to adopt WebAuthn. The lowest-risk starting point is to layer it on top of what you already have:
+
+1. Keep your current login (password, social, or passwordless) in place.
+2. Add passkey registration as an opt-in inside account settings.
+3. After a user registers a passkey, offer it as the default login on their next visit, with the existing method as fallback.
+4. For high-value accounts, move from optional to required once adoption is healthy.
+
+In SuperTokens, this means composing the WebAuthn recipe alongside your existing first-factor recipe, and optionally the [MFA recipe](https://supertokens.com/docs/additional-verification/mfa/webauthn-setup) when you want it enforced as a second factor. The migration becomes a configuration and UX exercise rather than a rewrite.
+
+### Resources
+
+For deeper reference as you build:
+
+- [W3C WebAuthn Level 3 specification](https://www.w3.org/TR/webauthn-3/): the authoritative source on the API and its data structures.
+- [MDN Web Authentication API docs](https://developer.mozilla.org/en-US/docs/Web/API/Web_Authentication_API): practical, example-driven reference for the browser API.
+- [SuperTokens passkeys documentation](https://supertokens.com/docs/authentication/passkeys/initial-setup): setup, customization, and MFA configuration.
+- [FIDO Alliance](https://fidoalliance.org/fido2-2/fido2-web-authentication-webauthn/): background on FIDO2, CTAP, and the broader passwordless ecosystem.
+- [passkeys.dev](https://passkeys.dev/): community guides and device support tables maintained alongside the FIDO Alliance and W3C.
+
+The shift away from shared secrets is already underway. Apple, Google, and Microsoft all support passkeys across their platforms, and the libraries and frameworks to implement WebAuthn are mature and well documented. Start by adding passkey registration as an option for your existing users, measure adoption, and expand from there. Phishing-resistant authentication is no longer a project reserved for large security teams; it is a recipe you can enable this week.
+
+<!-- Section word count: 461 -->
+<!-- Total word count: 5,829 -->
