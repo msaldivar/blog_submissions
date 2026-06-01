@@ -571,3 +571,21 @@ Adoption friction is the second cost. Users are unfamiliar with passkeys, and ac
 
 The practical answer for most teams is not "WebAuthn or nothing." It is WebAuthn as the preferred, default method, backed by TOTP and recovery options for the cases where it is unavailable. You get phishing-resistant authentication for the users and moments that matter most, without locking out anyone who cannot use it yet.
 
+## FAQ / People Also Ask
+
+### What is the difference between WebAuthn and FIDO2?
+
+FIDO2 is the overall framework; WebAuthn is one of its two components. FIDO2 combines WebAuthn (the W3C API that browsers and web applications use) with CTAP, the Client-to-Authenticator Protocol that handles communication between the device and external authenticators like security keys. In short, WebAuthn is what your web application calls, and CTAP is how the browser talks to the hardware. When people say "FIDO2 authentication," they are usually describing the full passwordless experience that WebAuthn enables.
+
+### Does WebAuthn work on mobile, iOS, and Android browsers?
+
+Yes. iOS supports WebAuthn through Safari using Face ID and Touch ID, and Android supports it through Chrome and the platform credential manager using fingerprint and PIN. Both platforms back synced passkeys (iCloud Keychain on Apple devices, Google Password Manager on Android), so a credential registered on a phone can follow the user across their devices. Mobile is one of the strongest environments for WebAuthn precisely because nearly every modern phone ships with a built-in biometric authenticator.
+
+### Can WebAuthn be used as a second factor?
+
+Yes. WebAuthn supports both single-factor (passwordless) and second-factor use. As a second factor, it replaces weaker options like SMS or TOTP with a phishing-resistant cryptographic check after a primary login. Many teams adopt it this way first, layering a WebAuthn security key or passkey on top of an existing password or social login, then move toward passwordless once adoption grows. Frameworks like SuperTokens let you configure WebAuthn as a required second factor for specific users or roles through their MFA recipe.
+
+### What happens if I lose my device with WebAuthn credentials?
+
+It depends on the type of credential. Synced passkeys are backed up to your platform account (iCloud or Google), so they are recoverable on a new device by signing back into that account. Device-bound credentials, like hardware security keys, are not recoverable; the private key is gone with the device. This is why backup matters. A well-designed implementation prompts you to register a second credential at enrollment and provides recovery codes, so losing one authenticator never means losing access to your account. If you do lose your only credential with no backup, you fall back to the application's account recovery process, which should require out-of-band identity verification.
+
