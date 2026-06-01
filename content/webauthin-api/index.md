@@ -392,3 +392,75 @@ Not every action in your application carries the same risk. A user browsing a da
 For routine access, a valid session token is sufficient. For sensitive operations, trigger step-up authentication using the strongest method the user has registered. If they have a WebAuthn credential, require it. If they only have TOTP, require that. This layered approach lets you enforce strong authentication where it matters without adding friction to every interaction.
 
 The underlying principle is straightforward: make the secure path the default path, design the fallbacks honestly, and never let the absence of one method leave a user without any path forward.
+
+## Using WebAuthn in a Plugin or Auth Framework (e.g. SuperTokens)
+
+Implementing WebAuthn from scratch means writing and maintaining challenge generation, CBOR parsing, attestation verification, signature validation, counter tracking, and credential storage. An auth framework handles that machinery for you and exposes WebAuthn as a configurable component. [SuperTokens](https://supertokens.com/docs/authentication/passkeys/initial-setup) is a good example: it ships WebAuthn (passkeys) as a recipe in its Node.js and Python SDKs, so you enable it the same way you enable email/password or social login.
+
+### Enabling WebAuthn via Plugin Configuration
+
+In SuperTokens, authentication methods are "recipes" that you add to a `recipeList`. Adding passkey support means adding the WebAuthn recipe to both your backend and frontend initialization.
+
+Backend (Node.js):
+
+```javascript
+import supertokens from "supertokens-node";
+import Session from "supertokens-node/recipe/session";
+import WebAuthn from "supertokens-node/recipe/webauthn";
+
+supertokens.init({
+  supertokens: { connectionURI: "..." },
+  appInfo: {
+    appName: "Your App",
+    apiDomain: "https://api.example.com",
+    websiteDomain: "https://example.com"
+  },
+  recipeList: [
+    WebAuthn.init(),
+    Session.init()
+  ]
+});
+```
+
+Frontend (React):
+
+```javascript
+import SuperTokens from "supertokens-auth-react";
+import WebAuthn from "supertokens-auth-react/recipe/webauthn";
+import Session from "supertokens-auth-react/recipe/session";
+
+SuperTokens.init({
+  appInfo: {
+    appName: "Your App",
+    apiDomain: "https://api.example.com",
+    websiteDomain: "https://example.com"
+  },
+  recipeList: [
+    WebAuthn.init(),
+    Session.init()
+  ]
+});
+```
+
+With those two changes, the framework wires up the API routes for credential options, signup, and signin. The core exposes endpoints like `POST /recipe/webauthn/options/signin` and `POST /recipe/webauthn/signup`, and the SDK handles the browser-side `navigator.credentials` calls and base64url encoding you would otherwise write yourself. If you use the prebuilt UI, the passkey registration and login screens render automatically. If you build custom UI, the SDK exposes functions that drive the same flows.
+
+### Registration, Authentication, Errors, and Fallback
+
+The recipe maps cleanly to the two WebAuthn ceremonies. On signup, the framework generates options, the SDK calls the authenticator, and the core verifies the attestation and stores the credential against the user. On signin, it generates a challenge, collects the assertion, verifies the signature, and updates the counter.
+
+Error handling is where framework integration earns its keep. WebAuthn surfaces a defined set of `DOMException` types: `NotAllowedError` when the user cancels or the prompt times out, `InvalidStateError` when a credential is already registered on the device, and `NotSupportedError` when the requested parameters are unavailable. The SDK normalizes these into status responses you can branch on, rather than leaving you to parse raw browser exceptions.
+
+For fallback, you compose recipes rather than building a parallel system. Pair the WebAuthn recipe with email/password or passwordless (magic link / OTP) recipes in the same `recipeList`. Users on devices without passkey support authenticate through the alternate method, and the framework manages both paths under one user identity. You can also configure the relying party ID, attestation policy, and user verification requirements through the recipe's customization options to match your security posture.
+
+### Migration Strategies for Existing Users
+
+You rarely flip an existing user base to WebAuthn overnight. The realistic path is optional, incremental adoption layered on top of your current authentication.
+
+Start by keeping your existing login intact and offering passkey registration as an opt-in inside account settings. After a user signs in with their password, prompt them to add a passkey for faster future logins. This builds a population of WebAuthn-capable accounts without forcing anyone through a migration wall.
+
+Once a user has registered a passkey, you can offer it as the default login method on their next visit while keeping the password available as fallback. Track adoption, and for high-value accounts (admins, users with elevated permissions), you can move from optional to required once enough of that cohort has enrolled.
+
+In SuperTokens specifically, this layering is handled by combining the WebAuthn recipe with your existing first-factor recipe, and optionally with the [MFA recipe](https://supertokens.com/docs/additional-verification/mfa/webauthn-setup) when you want WebAuthn enforced as a second factor for specific users or roles. The migration becomes a configuration and UX exercise rather than a rewrite of your auth layer.
+
+<!-- Section word count: 642 -->
+<!-- Total word count: 3,593 -->
