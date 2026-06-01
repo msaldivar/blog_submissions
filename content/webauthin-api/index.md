@@ -1,3 +1,12 @@
+---
+title: What Is the WebAuthn API (and How to Use It in Your Auth Flow)
+description: "Learn how the WebAuthn API enables passwordless, phishing-resistant login. Get step-by-step code and how to plug it into your auth stack."
+date: "2026-06-01"
+cover: "TODO.png"
+category: "webauthn, authentication, guide"
+author: "Maurice Saldivar"
+---
+
 # What Is the WebAuthn API?
 
 The Web Authentication API (WebAuthn) is a [W3C standard](https://www.w3.org/TR/webauthn-3/) that lets web applications authenticate users with public-key cryptography instead of passwords. It is the browser-facing half of the [FIDO2 framework](https://fidoalliance.org/fido2-2/fido2-web-authentication-webauthn/), which pairs WebAuthn with the Client-to-Authenticator Protocol (CTAP) to enable passwordless, phishing-resistant login across browsers and platforms. WebAuthn reached W3C Recommendation status in March 2019, and Level 3 of the spec entered Candidate Recommendation in January 2026 with support across Chrome, Firefox, Edge, and Safari.
