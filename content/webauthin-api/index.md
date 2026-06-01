@@ -538,5 +538,36 @@ const ALLOWED_ORIGINS = process.env.NODE_ENV === 'production'
 
 A mismatched or overly broad relying party ID (allowing wildcard subdomains, for instance) can also create silent failures or widen your attack surface. Set the RP ID to the registrable domain you actually serve, test it against your real origin, and resist the urge to loosen it to make a misconfiguration "work."
 
-<!-- Section word count: 808 -->
-<!-- Total word count: 4,401 -->
+## WebAuthn vs Other Auth Methods: When Should You Use It?
+
+WebAuthn is the strongest browser-based authentication available, but "strongest" does not mean "right for every situation." Choosing it well means understanding what it beats, where it shines, and what it costs.
+
+### How It Compares
+
+The decisive difference between WebAuthn and every password-derived method is the shared secret. Passwords, OTP codes, and TOTP seeds are all secrets that exist in two places and can be intercepted, phished, or leaked. WebAuthn's private key never leaves the authenticator, so there is nothing to intercept.
+
+| Method | Phishing-resistant | Shared secret | Breach exposure | User friction |
+|---|---|---|---|---|
+| Password only | No | Yes | High (stored hashes) | Low |
+| Password + SMS OTP | No | Yes | Medium (interceptable) | Medium |
+| Password + TOTP | Partial | Yes (seed) | Medium (seed theft) | Medium |
+| WebAuthn | Yes | No | Minimal (public keys only) | Low to medium |
+
+Against password-plus-SMS-OTP, WebAuthn wins decisively. SMS codes are vulnerable to SIM swapping and interception, and the password underneath remains phishable. TOTP (authenticator-app codes) is stronger because the code is generated locally and never transmitted as a long-lived secret, but the shared seed can still be stolen at enrollment, and a user can be tricked into typing a valid code into a phishing page. WebAuthn closes that gap entirely: even a user who wants to authenticate on a phishing site cannot, because the browser will not release a credential bound to a different origin.
+
+Compared to traditional MFA generally, the difference is architectural rather than incremental. Traditional MFA stacks a second shared secret on top of the first. WebAuthn replaces the secret model with possession of a private key plus local user verification. That is why it resists the entire phishing and credential-stuffing class of attacks rather than just raising the cost.
+
+### Where WebAuthn Is the Right Choice
+
+WebAuthn is the strongest fit anywhere phishing resistance is a hard requirement. High-value targets benefit most: admin consoles, financial and healthcare applications, developer infrastructure, and any system where a compromised account causes serious downstream damage. It is also a strong choice for step-up authentication on sensitive operations, where you want cryptographic assurance for actions like changing credentials or approving transactions.
+
+Consumer-facing products with broad device support are increasingly good candidates too, especially using synced passkeys. The login experience (a fingerprint or face scan) is often faster and smoother than typing a password plus an OTP code, so the security upgrade can actually reduce friction rather than add it.
+
+### The Tradeoffs Are Real
+
+Device availability is the main constraint. Not every user has a biometric sensor or a security key, and users logging in from shared or borrowed machines may not have access to their authenticator. This is why a fallback path is mandatory rather than optional, as covered earlier.
+
+Adoption friction is the second cost. Users are unfamiliar with passkeys, and account recovery becomes more involved when there is no password to reset. A lost device with no backup credential and no recovery method means a locked-out user. You absorb this cost through deliberate onboarding: prompt for a backup credential at registration, provide recovery codes, and keep a well-designed fallback chain in place.
+
+The practical answer for most teams is not "WebAuthn or nothing." It is WebAuthn as the preferred, default method, backed by TOTP and recovery options for the cases where it is unavailable. You get phishing-resistant authentication for the users and moments that matter most, without locking out anyone who cannot use it yet.
+
