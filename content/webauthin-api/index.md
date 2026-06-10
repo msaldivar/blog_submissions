@@ -1,8 +1,8 @@
 ---
 title: What Is the WebAuthn API (and How to Use It in Your Auth Flow)
 description: "Learn how the WebAuthn API enables passwordless, phishing-resistant login. Get step-by-step code and how to plug it into your auth stack."
-date: "2026-06-01"
-cover: "TODO.png"
+date: "2026-06-09"
+cover: "webauthn_api.png"
 category: "webauthn, authentication, guide"
 author: "Maurice Saldivar"
 ---
