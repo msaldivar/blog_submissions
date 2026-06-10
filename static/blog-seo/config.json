@@ -3323,7 +3323,7 @@
         "title": "The Hidden Costs of Building Your Own Authentication Stacks",
         "schema": "<script type=\"application/ld+json\"> {\n            \"@context\": \"https://schema.org\",\n            \"@type\": \"Article\",\n            \"mainEntityOfPage\": {\n                \"@type\": \"WebPage\",\n                \"@id\": \"https://supertokens.com/blog/the-hidden-cost-of-building-your-own-auth-stacks\"\n            },\n            \"headline\": \"Building authentication in-house drains time, money, and focus. See the hidden costs and why SuperTokens slashes them.\",\n            \"image\": \"https://supertokens.com/blog-meta-images/the-hidden-cost-of-building-your-own-auth-stacks.png\",\n            \"author\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"url\": \"https://supertokens.com\"\n            },\n            \"publisher\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"logo\": {\n                    \"@type\": \"ImageObject\",\n                    \"url\": \"https://supertokens.com/static/assets/dark-home/logo.png\"\n                }\n            }\n        }</script>"
     },
-    {    
+    {
         "path": "/blog/frontegg-vs-auth0-vs-fusionauth",
         "metaTags": [
             "<meta name=\"description\" content=\"undefined\" />",
@@ -4841,7 +4841,7 @@
         "title": "Secure Multi-Tenant Authentication: SaaS RBAC with SuperTokens",
         "schema": "<script type=\"application/ld+json\"> {\n            \"@context\": \"https://schema.org\",\n            \"@type\": \"Article\",\n            \"mainEntityOfPage\": {\n                \"@type\": \"WebPage\",\n                \"@id\": \"https://supertokens.com/blog/secure-multi-tenant-auth\"\n            },\n            \"headline\": \"For B2B SaaS and platform builders shipping tenant-aware authentication, SSO, and least-privilege access with open-source ergonomics and enterprise guarantees.\",\n            \"image\": \"https://supertokens.com/blog-meta-images/secure-multi-tenant-auth.png\",\n            \"author\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"url\": \"https://supertokens.com\"\n            },\n            \"publisher\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"logo\": {\n                    \"@type\": \"ImageObject\",\n                    \"url\": \"https://supertokens.com/static/assets/dark-home/logo.png\"\n                }\n            }\n        }</script>"
     },
-    {   
+    {
         "path": "/blog/auth-for-ai-agents",
         "metaTags": [
             "<meta name=\"description\" content=\"Secure AI agents with scoped tokens, DPoP, tool-level policies, and human approvals.\" />",
@@ -5208,5 +5208,28 @@
         ],
         "title": "Introducing Evergreen Hosting: Automatic Upgrades for SuperTokens",
         "schema": "<script type=\"application/ld+json\"> {\n            \"@context\": \"https://schema.org\",\n            \"@type\": \"Article\",\n            \"mainEntityOfPage\": {\n                \"@type\": \"WebPage\",\n                \"@id\": \"https://supertokens.com/blog/evergreen-hosting-announcement\"\n            },\n            \"headline\": \"SuperTokens managed instances will now automatically receive stable upgrades with zero downtime, instant rollback, and continuous monitoring\",\n            \"image\": \"https://supertokens.com/blog-meta-images/evergreen-hosting-announcement.png\",\n            \"author\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"url\": \"https://supertokens.com\"\n            },\n            \"publisher\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"logo\": {\n                    \"@type\": \"ImageObject\",\n                    \"url\": \"https://supertokens.com/static/assets/dark-home/logo.png\"\n                }\n            }\n        }</script>"
+    },
+    {
+        "path": "/blog/webauthin-api",
+        "metaTags": [
+            "<meta name=\"description\" content=\"Learn how the WebAuthn API enables passwordless, phishing-resistant login. Get step-by-step code and how to plug it into your auth stack.\" />",
+            "",
+            "<meta name=\"keywords\" content=\"Authentication, Open Source, Authorization, User Management, OAuth, Enterprise SSO, Security\" />",
+            "<!--OG Tags-->",
+            "<meta property=\"og:title\" content=\"What Is the WebAuthn API (and How to Use It in Your Auth Flow)\" />",
+            "<meta property=\"og:type\" content=\"article\" />",
+            "<meta property=\"og:url\" content=\"https://supertokens.com/blog/webauthin-api\" />",
+            "<meta property=\"og:description\" content=\"Learn how the WebAuthn API enables passwordless, phishing-resistant login. Get step-by-step code and how to plug it into your auth stack.\"/>",
+            "<meta property=\"og:image\" content=\"https://supertokens.com/blog-meta-images/webauthn_api.png\" />",
+            "",
+            "<meta name=\"twitter:card\" content=\"summary_large_image\" />",
+            "<meta name=\"twitter:title\" content=\"Learn how the WebAuthn API enables passwordless, phishing-resistant login. Get step-by-step code and how to plug it into your auth stack.\" />",
+            "<meta name=\"twitter:url\" content=\"https://supertokens.com/blog/webauthin-api\" />",
+            "<meta name=\"twitter:image\" content=\"https://supertokens.com/blog-meta-images/webauthn_api.png\" /> ",
+            "<!--OG Tags-->",
+            "<link rel=\"canonical\" href=\"https://supertokens.com/blog/webauthin-api\">"
+        ],
+        "title": "What Is the WebAuthn API (and How to Use It in Your Auth Flow)",
+        "schema": "<script type=\"application/ld+json\"> {\n            \"@context\": \"https://schema.org\",\n            \"@type\": \"Article\",\n            \"mainEntityOfPage\": {\n                \"@type\": \"WebPage\",\n                \"@id\": \"https://supertokens.com/blog/webauthin-api\"\n            },\n            \"headline\": \"Learn how the WebAuthn API enables passwordless, phishing-resistant login. Get step-by-step code and how to plug it into your auth stack.\",\n            \"image\": \"https://supertokens.com/blog-meta-images/webauthn_api.png\",\n            \"author\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"url\": \"https://supertokens.com\"\n            },\n            \"publisher\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"logo\": {\n                    \"@type\": \"ImageObject\",\n                    \"url\": \"https://supertokens.com/static/assets/dark-home/logo.png\"\n                }\n            }\n        }</script>"
     }
 ]
