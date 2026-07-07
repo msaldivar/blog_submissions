@@ -311,6 +311,9 @@
     {
         "location": "https://supertokens.com/blog/react-bootstrap-forms"
     },
+    {
+        "location": "https://supertokens.com/blog/saml-vs-sso"
+    },
     {    
         "location": "https://supertokens.com/blog/the-hidden-cost-of-building-your-own-auth-stacks"
     },
