@@ -317,7 +317,7 @@
     {    
         "location": "https://supertokens.com/blog/the-hidden-cost-of-building-your-own-auth-stacks"
     },
-    {    
+    {
         "location": "https://supertokens.com/blog/frontegg-vs-auth0-vs-fusionauth"
     },
     {
@@ -530,7 +530,7 @@
     {
         "location": "https://supertokens.com/blog/secure-multi-tenant-auth"
     },
-    {    
+    {
         "location": "https://supertokens.com/blog/auth-for-ai-agents"
     },
     {
@@ -580,5 +580,8 @@
     },
     {
         "location": "https://supertokens.com/blog/evergreen-hosting-announcement"
+    },
+    {
+        "location": "https://supertokens.com/blog/webauthin-api"
     }
 ]
