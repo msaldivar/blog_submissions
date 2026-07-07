@@ -3301,6 +3301,53 @@
         "schema": "<script type=\"application/ld+json\"> {\n            \"@context\": \"https://schema.org\",\n            \"@type\": \"Article\",\n            \"mainEntityOfPage\": {\n                \"@type\": \"WebPage\",\n                \"@id\": \"https://supertokens.com/blog/identity-and-access-management-strategy\"\n            },\n            \"headline\": \"Discover how to develop an effective Identity and Access Management (IAM) strategy that secures sensitive data, ensures compliance, and streamlines user experiences.\",\n            \"image\": \"https://supertokens.com/blog-meta-images/iam-strategy.png\",\n            \"author\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"url\": \"https://supertokens.com\"\n            },\n            \"publisher\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"logo\": {\n                    \"@type\": \"ImageObject\",\n                    \"url\": \"https://supertokens.com/static/assets/dark-home/logo.png\"\n                }\n            }\n        }</script>"
     },
     {
+        "path": "/blog/react-bootstrap-forms",
+        "metaTags": [
+            "<meta name=\"description\" content=\"A step-by-step guide to building, validating, and styling forms in React using the react-bootstrap library.\" />",
+            "",
+            "<meta name=\"keywords\" content=\"Authentication, Open Source, Authorization, User Management, OAuth, Enterprise SSO, Security\" />",
+            "<!--OG Tags-->",
+            "<meta property=\"og:title\" content=\"Create Responsive, Accessible Forms with React Bootstrap\" />",
+            "<meta property=\"og:type\" content=\"article\" />",
+            "<meta property=\"og:url\" content=\"https://supertokens.com/blog/react-bootstrap-forms\" />",
+            "<meta property=\"og:description\" content=\"A step-by-step guide to building, validating, and styling forms in React using the react-bootstrap library.\"/>",
+            "<meta property=\"og:image\" content=\"https://supertokens.com/blog-meta-images/react-bootstrap-forms.png\" />",
+            "",
+            "<meta name=\"twitter:card\" content=\"summary_large_image\" />",
+            "<meta name=\"twitter:title\" content=\"A step-by-step guide to building, validating, and styling forms in React using the react-bootstrap library.\" />",
+            "<meta name=\"twitter:url\" content=\"https://supertokens.com/blog/react-bootstrap-forms\" />",
+            "<meta name=\"twitter:image\" content=\"https://supertokens.com/blog-meta-images/react-bootstrap-forms.png\" /> ",
+            "<!--OG Tags-->",
+            "<link rel=\"canonical\" href=\"https://supertokens.com/blog/react-bootstrap-forms\">"
+        ],
+        "title": "Create Responsive, Accessible Forms with React Bootstrap",
+        "schema": "<script type=\"application/ld+json\"> {\n            \"@context\": \"https://schema.org\",\n            \"@type\": \"Article\",\n            \"mainEntityOfPage\": {\n                \"@type\": \"WebPage\",\n                \"@id\": \"https://supertokens.com/blog/react-bootstrap-forms\"\n            },\n            \"headline\": \"A step-by-step guide to building, validating, and styling forms in React using the react-bootstrap library.\",\n            \"image\": \"https://supertokens.com/blog-meta-images/react-bootstrap-forms.png\",\n            \"author\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"url\": \"https://supertokens.com\"\n            },\n            \"publisher\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"logo\": {\n                    \"@type\": \"ImageObject\",\n                    \"url\": \"https://supertokens.com/static/assets/dark-home/logo.png\"\n                }\n            }\n        }</script>"
+     },
+    {
+        "path": "/blog/saml-vs-sso",
+        "metaTags": [
+            "<meta name=\"description\" content=\"SAML and SSO aren't the same thing. Learn the key differences, how SAML-based SSO works step by step, when to use SAML vs OIDC, and how to implement it with SuperTokens.\" />",
+            "",
+            "<meta name=\"keywords\" content=\"Authentication, Open Source, Authorization, User Management, OAuth, Enterprise SSO, Security\" />",
+            "<!--OG Tags-->",
+            "<meta property=\"og:title\" content=\"SAML vs SSO: What's the Difference, How They Work Together, and Which One You Actually Need\" />",
+            "<meta property=\"og:type\" content=\"article\" />",
+            "<meta property=\"og:url\" content=\"https://supertokens.com/blog/saml-vs-sso\" />",
+            "<meta property=\"og:description\" content=\"SAML and SSO aren't the same thing. Learn the key differences, how SAML-based SSO works step by step, when to use SAML vs OIDC, and how to implement it with SuperTokens.\"/>",
+            "<meta property=\"og:image\" content=\"https://supertokens.com/blog-meta-images/saml-vs-sso.png\" />",
+            "",
+            "<meta name=\"twitter:card\" content=\"summary_large_image\" />",
+            "<meta name=\"twitter:title\" content=\"SAML and SSO aren't the same thing. Learn the key differences, how SAML-based SSO works step by step, when to use SAML vs OIDC, and how to implement it with SuperTokens.\" />",
+            "<meta name=\"twitter:url\" content=\"https://supertokens.com/blog/saml-vs-sso\" />",
+            "<meta name=\"twitter:image\" content=\"https://supertokens.com/blog-meta-images/saml-vs-sso.png\" /> ",
+            "<!--OG Tags-->",
+            "<link rel=\"canonical\" href=\"https://supertokens.com/blog/saml-vs-sso\">"
+        ],
+        "title": "SAML vs SSO: What's the Difference, How They Work Together, and Which One You Actually Need",
+        "schema": "<script type=\"application/ld+json\"> {\n            \"@context\": \"https://schema.org\",\n            \"@type\": \"Article\",\n            \"mainEntityOfPage\": {\n                \"@type\": \"WebPage\",\n                \"@id\": \"https://supertokens.com/blog/saml-vs-sso\"\n            },\n            \"headline\": \"SAML and SSO aren't the same thing. Learn the key differences, how SAML-based SSO works step by step, when to use SAML vs OIDC, and how to implement it with SuperTokens.\",\n            \"image\": \"https://supertokens.com/blog-meta-images/saml-vs-sso.png\",\n            \"author\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"url\": \"https://supertokens.com\"\n            },\n            \"publisher\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"logo\": {\n                    \"@type\": \"ImageObject\",\n                    \"url\": \"https://supertokens.com/static/assets/dark-home/logo.png\"\n                }\n            }\n        }</script>"
+
+    },
+    {    
         "path": "/blog/the-hidden-cost-of-building-your-own-auth-stacks",
         "metaTags": [
             "<meta name=\"description\" content=\"Building authentication in-house drains time, money, and focus. See the hidden costs and why SuperTokens slashes them.\" />",
