@@ -1,5 +1,5 @@
 ---
-title: What is a JWT? Understanding JSON Web Tokens 
+title: "What is a JWT? Understanding JSON Web Tokens (2026 Guide)"
 date: "2024-08-02"
 description: "Explore JWT tokens: secure, compact credentials for modern web authentication. Learn how they work, their benefits, and best practices for implementing them in your applications."
 cover: "what-is-jwt-cover.png"

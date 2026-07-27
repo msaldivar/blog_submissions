@@ -1,5 +1,5 @@
 ---
-title: Fixing CORS Errors What They Are and How to Resolve Them
+title: "Fixing CORS Errors: What They Are and How to Resolve Them (2026)"
 description: "Learn what causes CORS errors, how they impact your web app, and how to fix them securely with proper headers and backend configurations."
 date: "2025-07-20"
 cover: "cors_errors.png"

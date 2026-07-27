@@ -1,5 +1,5 @@
 ---
-title: What Is a YubiKey and When to Use It vs. Authenticator Apps
+title: "What Is a YubiKey and When to Use It vs. Authenticator Apps (2026)"
 description: "Discover how YubiKeys work, when to choose them over authenticator apps, and how to integrate both in your auth flow."
 date: "2025-08-18"
 cover: "what_is_a_yubikey.png"
