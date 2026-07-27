@@ -1,5 +1,5 @@
 ---
-title: "What is IDP Authentication: How Identity Providers Secure Your Apps"
+title: "What is IDP Authentication: How Identity Providers Secure Your Apps (2026)"
 date: "2025-01-27"
 description: "Learn how IDP authentication works, why it’s critical for secure access management, and how to integrate tools like SuperTokens for seamless implementation."
 cover: "idp-auth.png"

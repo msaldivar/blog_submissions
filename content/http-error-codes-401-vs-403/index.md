@@ -1,7 +1,7 @@
 ---
-title: Demystifying HTTP Error Codes 401 vs 403
+title: "Demystifying HTTP Error Codes: 401 vs 403 (2026)"
 date: "2023-09-01"
-description: "In this blog we will go over the http protocol error codes 401 and 403 and describe when is it appropriate to use each of them."
+description: "Learn the difference between HTTP 401 Unauthorized and 403 Forbidden errors, when each applies, and how to handle them correctly in your app."
 cover: "http-error-codes-401-vs-403.png"
 category: "programming"
 author: "Joel Coutinho"

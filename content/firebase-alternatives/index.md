@@ -1,5 +1,5 @@
 ---
-title: "4 Best Firebase Alternatives for Scalable App Development [2025 Guide]"
+title: "4 Best Firebase Alternatives for Scalable App Development [2026 Guide]"
 date: "2025-03-08"
 description: "Discover the top Firebase alternatives, their features, and how they compare. Learn why SuperTokens is the best authentication solution for secure and scalable apps."
 cover: "firebase-alternatives.png"

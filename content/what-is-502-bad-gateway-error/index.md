@@ -1,5 +1,5 @@
 ---
-title: "Everything You Need to Know About 502 Bad Gateway Errors"
+title: "Everything You Need to Know About 502 Bad Gateway Errors (2026)"
 description: "Discover the ins and outs of 502 Bad Gateway Errors. From understanding the causes to troubleshooting steps and preventive measures, navigate through server communication breakdowns seamlessly."
 date: "2024-04-05"
 cover: "what-is-502-bad-gateway-error.png"
