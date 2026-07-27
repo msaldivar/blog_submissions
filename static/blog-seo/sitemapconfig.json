@@ -531,6 +531,9 @@
         "location": "https://supertokens.com/blog/oauth-flows"
     },
     {  
+        "location": "https://supertokens.com/blog/session-hijacking-fixation"
+    },
+    {    
         "location": "https://supertokens.com/blog/secure-multi-tenant-auth"
     },
     {
