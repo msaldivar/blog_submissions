@@ -44,3 +44,8 @@ To mitigate the risk of encountering 502 errors, consider:
 ## Conclusion:
 
 Encountering a 502 Bad Gateway Error doesn't spell doom for your online journey. By understanding its causes and implementing preventive measures, both users and website owners can navigate through these hiccups seamlessly. So, the next time you face a 502 error, remember, it's just a temporary setback, and with the right approach, you'll be back on track in no time. Happy browsing!
+
+## Related reading
+
+- [HTTP Error Codes: 401 vs. 403](https://supertokens.com/blog/http-error-codes-401-vs-403)
+- [How to Fix CORS Errors](https://supertokens.com/blog/cors-errors)
