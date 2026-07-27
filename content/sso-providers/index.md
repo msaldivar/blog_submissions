@@ -433,3 +433,10 @@ Choose based on your actual needs: technical expertise, integrations, scale, and
 Your users get fewer passwords. Security gets centralized monitoring. Developers skip building another login system. Everyone wins.
 
 Ready to simplify authentication? Pick a provider, build a proof of concept, and watch your password reset tickets disappear. The future of auth is open, flexible, and refreshingly straightforward.
+
+## Related reading
+
+- [Implementing SSO: A Step-by-Step Guide](https://supertokens.com/blog/sso-implementation)
+- [SAML vs. OAuth: What's the Difference?](https://supertokens.com/blog/saml-vs-oauth)
+- [What Is IDP Authentication?](https://supertokens.com/blog/idp-auth)
+- [What Is an Identity Provider (IDP)?](https://supertokens.com/blog/what-is-an-identity-provider)
