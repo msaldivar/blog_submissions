@@ -233,6 +233,10 @@ public class PasswordHashing {
 }
 ```
 
+## How SuperTokens Handles Password Hashing
+
+As the footnotes below stress, password hashing is not something you should implement yourself. [SuperTokens](https://supertokens.com) handles this for you: it hashes and salts credentials using battle-tested algorithms (bcrypt and Argon2) with sensible work-factor defaults, so you get secure password storage without maintaining crypto code. It's [open source](https://supertokens.com/blog/open-source-identity-management), and pairs password storage with secure [session management](https://supertokens.com/blog/session-based-authentication) out of the box.
+
 ## Footnotes
 
 - Secure vaults can help protect encryption keys, but there is always a risk of compromise.
