@@ -3301,6 +3301,53 @@
         "schema": "<script type=\"application/ld+json\"> {\n            \"@context\": \"https://schema.org\",\n            \"@type\": \"Article\",\n            \"mainEntityOfPage\": {\n                \"@type\": \"WebPage\",\n                \"@id\": \"https://supertokens.com/blog/identity-and-access-management-strategy\"\n            },\n            \"headline\": \"Discover how to develop an effective Identity and Access Management (IAM) strategy that secures sensitive data, ensures compliance, and streamlines user experiences.\",\n            \"image\": \"https://supertokens.com/blog-meta-images/iam-strategy.png\",\n            \"author\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"url\": \"https://supertokens.com\"\n            },\n            \"publisher\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"logo\": {\n                    \"@type\": \"ImageObject\",\n                    \"url\": \"https://supertokens.com/static/assets/dark-home/logo.png\"\n                }\n            }\n        }</script>"
     },
     {
+        "path": "/blog/react-bootstrap-forms",
+        "metaTags": [
+            "<meta name=\"description\" content=\"A step-by-step guide to building, validating, and styling forms in React using the react-bootstrap library.\" />",
+            "",
+            "<meta name=\"keywords\" content=\"Authentication, Open Source, Authorization, User Management, OAuth, Enterprise SSO, Security\" />",
+            "<!--OG Tags-->",
+            "<meta property=\"og:title\" content=\"Create Responsive, Accessible Forms with React Bootstrap\" />",
+            "<meta property=\"og:type\" content=\"article\" />",
+            "<meta property=\"og:url\" content=\"https://supertokens.com/blog/react-bootstrap-forms\" />",
+            "<meta property=\"og:description\" content=\"A step-by-step guide to building, validating, and styling forms in React using the react-bootstrap library.\"/>",
+            "<meta property=\"og:image\" content=\"https://supertokens.com/blog-meta-images/react-bootstrap-forms.png\" />",
+            "",
+            "<meta name=\"twitter:card\" content=\"summary_large_image\" />",
+            "<meta name=\"twitter:title\" content=\"A step-by-step guide to building, validating, and styling forms in React using the react-bootstrap library.\" />",
+            "<meta name=\"twitter:url\" content=\"https://supertokens.com/blog/react-bootstrap-forms\" />",
+            "<meta name=\"twitter:image\" content=\"https://supertokens.com/blog-meta-images/react-bootstrap-forms.png\" /> ",
+            "<!--OG Tags-->",
+            "<link rel=\"canonical\" href=\"https://supertokens.com/blog/react-bootstrap-forms\">"
+        ],
+        "title": "Create Responsive, Accessible Forms with React Bootstrap",
+        "schema": "<script type=\"application/ld+json\"> {\n            \"@context\": \"https://schema.org\",\n            \"@type\": \"Article\",\n            \"mainEntityOfPage\": {\n                \"@type\": \"WebPage\",\n                \"@id\": \"https://supertokens.com/blog/react-bootstrap-forms\"\n            },\n            \"headline\": \"A step-by-step guide to building, validating, and styling forms in React using the react-bootstrap library.\",\n            \"image\": \"https://supertokens.com/blog-meta-images/react-bootstrap-forms.png\",\n            \"author\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"url\": \"https://supertokens.com\"\n            },\n            \"publisher\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"logo\": {\n                    \"@type\": \"ImageObject\",\n                    \"url\": \"https://supertokens.com/static/assets/dark-home/logo.png\"\n                }\n            }\n        }</script>"
+     },
+    {
+        "path": "/blog/saml-vs-sso",
+        "metaTags": [
+            "<meta name=\"description\" content=\"SAML and SSO aren't the same thing. Learn the key differences, how SAML-based SSO works step by step, when to use SAML vs OIDC, and how to implement it with SuperTokens.\" />",
+            "",
+            "<meta name=\"keywords\" content=\"Authentication, Open Source, Authorization, User Management, OAuth, Enterprise SSO, Security\" />",
+            "<!--OG Tags-->",
+            "<meta property=\"og:title\" content=\"SAML vs SSO: What's the Difference, How They Work Together, and Which One You Actually Need\" />",
+            "<meta property=\"og:type\" content=\"article\" />",
+            "<meta property=\"og:url\" content=\"https://supertokens.com/blog/saml-vs-sso\" />",
+            "<meta property=\"og:description\" content=\"SAML and SSO aren't the same thing. Learn the key differences, how SAML-based SSO works step by step, when to use SAML vs OIDC, and how to implement it with SuperTokens.\"/>",
+            "<meta property=\"og:image\" content=\"https://supertokens.com/blog-meta-images/saml-vs-sso.png\" />",
+            "",
+            "<meta name=\"twitter:card\" content=\"summary_large_image\" />",
+            "<meta name=\"twitter:title\" content=\"SAML and SSO aren't the same thing. Learn the key differences, how SAML-based SSO works step by step, when to use SAML vs OIDC, and how to implement it with SuperTokens.\" />",
+            "<meta name=\"twitter:url\" content=\"https://supertokens.com/blog/saml-vs-sso\" />",
+            "<meta name=\"twitter:image\" content=\"https://supertokens.com/blog-meta-images/saml-vs-sso.png\" /> ",
+            "<!--OG Tags-->",
+            "<link rel=\"canonical\" href=\"https://supertokens.com/blog/saml-vs-sso\">"
+        ],
+        "title": "SAML vs SSO: What's the Difference, How They Work Together, and Which One You Actually Need",
+        "schema": "<script type=\"application/ld+json\"> {\n            \"@context\": \"https://schema.org\",\n            \"@type\": \"Article\",\n            \"mainEntityOfPage\": {\n                \"@type\": \"WebPage\",\n                \"@id\": \"https://supertokens.com/blog/saml-vs-sso\"\n            },\n            \"headline\": \"SAML and SSO aren't the same thing. Learn the key differences, how SAML-based SSO works step by step, when to use SAML vs OIDC, and how to implement it with SuperTokens.\",\n            \"image\": \"https://supertokens.com/blog-meta-images/saml-vs-sso.png\",\n            \"author\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"url\": \"https://supertokens.com\"\n            },\n            \"publisher\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"logo\": {\n                    \"@type\": \"ImageObject\",\n                    \"url\": \"https://supertokens.com/static/assets/dark-home/logo.png\"\n                }\n            }\n        }</script>"
+
+    },
+    {    
         "path": "/blog/the-hidden-cost-of-building-your-own-auth-stacks",
         "metaTags": [
             "<meta name=\"description\" content=\"Building authentication in-house drains time, money, and focus. See the hidden costs and why SuperTokens slashes them.\" />",
@@ -3323,7 +3370,7 @@
         "title": "The Hidden Costs of Building Your Own Authentication Stacks",
         "schema": "<script type=\"application/ld+json\"> {\n            \"@context\": \"https://schema.org\",\n            \"@type\": \"Article\",\n            \"mainEntityOfPage\": {\n                \"@type\": \"WebPage\",\n                \"@id\": \"https://supertokens.com/blog/the-hidden-cost-of-building-your-own-auth-stacks\"\n            },\n            \"headline\": \"Building authentication in-house drains time, money, and focus. See the hidden costs and why SuperTokens slashes them.\",\n            \"image\": \"https://supertokens.com/blog-meta-images/the-hidden-cost-of-building-your-own-auth-stacks.png\",\n            \"author\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"url\": \"https://supertokens.com\"\n            },\n            \"publisher\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"logo\": {\n                    \"@type\": \"ImageObject\",\n                    \"url\": \"https://supertokens.com/static/assets/dark-home/logo.png\"\n                }\n            }\n        }</script>"
     },
-    {    
+    {
         "path": "/blog/frontegg-vs-auth0-vs-fusionauth",
         "metaTags": [
             "<meta name=\"description\" content=\"undefined\" />",
@@ -4841,7 +4888,7 @@
         "title": "Secure Multi-Tenant Authentication: SaaS RBAC with SuperTokens",
         "schema": "<script type=\"application/ld+json\"> {\n            \"@context\": \"https://schema.org\",\n            \"@type\": \"Article\",\n            \"mainEntityOfPage\": {\n                \"@type\": \"WebPage\",\n                \"@id\": \"https://supertokens.com/blog/secure-multi-tenant-auth\"\n            },\n            \"headline\": \"For B2B SaaS and platform builders shipping tenant-aware authentication, SSO, and least-privilege access with open-source ergonomics and enterprise guarantees.\",\n            \"image\": \"https://supertokens.com/blog-meta-images/secure-multi-tenant-auth.png\",\n            \"author\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"url\": \"https://supertokens.com\"\n            },\n            \"publisher\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"logo\": {\n                    \"@type\": \"ImageObject\",\n                    \"url\": \"https://supertokens.com/static/assets/dark-home/logo.png\"\n                }\n            }\n        }</script>"
     },
-    {   
+    {
         "path": "/blog/auth-for-ai-agents",
         "metaTags": [
             "<meta name=\"description\" content=\"Secure AI agents with scoped tokens, DPoP, tool-level policies, and human approvals.\" />",
@@ -5185,5 +5232,51 @@
         ],
         "title": "Best Self-Hosted Authentication Solutions in 2026",
         "schema": "<script type=\"application/ld+json\"> {\n            \"@context\": \"https://schema.org\",\n            \"@type\": \"Article\",\n            \"mainEntityOfPage\": {\n                \"@type\": \"WebPage\",\n                \"@id\": \"https://supertokens.com/blog/self-hosted-auth-solutions-in-2026\"\n            },\n            \"headline\": \"Compare the leading self-hosted authentication platforms for 2026 — scalability, control, cost, and developer-experience highlight how SuperTokens stands out.\",\n            \"image\": \"https://supertokens.com/blog-meta-images/self-hosted_authentication_2026.png\",\n            \"author\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"url\": \"https://supertokens.com\"\n            },\n            \"publisher\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"logo\": {\n                    \"@type\": \"ImageObject\",\n                    \"url\": \"https://supertokens.com/static/assets/dark-home/logo.png\"\n                }\n            }\n        }</script>"
+    },
+    {
+        "path": "/blog/evergreen-hosting-announcement",
+        "metaTags": [
+            "<meta name=\"description\" content=\"SuperTokens managed instances will now automatically receive stable upgrades with zero downtime, instant rollback, and continuous monitoring\" />",
+            "",
+            "<meta name=\"keywords\" content=\"Authentication, Open Source, Authorization, User Management, OAuth, Enterprise SSO, Security\" />",
+            "<!--OG Tags-->",
+            "<meta property=\"og:title\" content=\"Introducing Evergreen Hosting: Automatic Upgrades for SuperTokens\" />",
+            "<meta property=\"og:type\" content=\"article\" />",
+            "<meta property=\"og:url\" content=\"https://supertokens.com/blog/evergreen-hosting-announcement\" />",
+            "<meta property=\"og:description\" content=\"SuperTokens managed instances will now automatically receive stable upgrades with zero downtime, instant rollback, and continuous monitoring\"/>",
+            "<meta property=\"og:image\" content=\"https://supertokens.com/blog-meta-images/evergreen-hosting-announcement.png\" />",
+            "",
+            "<meta name=\"twitter:card\" content=\"summary_large_image\" />",
+            "<meta name=\"twitter:title\" content=\"SuperTokens managed instances will now automatically receive stable upgrades with zero downtime, instant rollback, and continuous monitoring\" />",
+            "<meta name=\"twitter:url\" content=\"https://supertokens.com/blog/evergreen-hosting-announcement\" />",
+            "<meta name=\"twitter:image\" content=\"https://supertokens.com/blog-meta-images/evergreen-hosting-announcement.png\" /> ",
+            "<!--OG Tags-->",
+            "<link rel=\"canonical\" href=\"https://supertokens.com/blog/evergreen-hosting-announcement\">"
+        ],
+        "title": "Introducing Evergreen Hosting: Automatic Upgrades for SuperTokens",
+        "schema": "<script type=\"application/ld+json\"> {\n            \"@context\": \"https://schema.org\",\n            \"@type\": \"Article\",\n            \"mainEntityOfPage\": {\n                \"@type\": \"WebPage\",\n                \"@id\": \"https://supertokens.com/blog/evergreen-hosting-announcement\"\n            },\n            \"headline\": \"SuperTokens managed instances will now automatically receive stable upgrades with zero downtime, instant rollback, and continuous monitoring\",\n            \"image\": \"https://supertokens.com/blog-meta-images/evergreen-hosting-announcement.png\",\n            \"author\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"url\": \"https://supertokens.com\"\n            },\n            \"publisher\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"logo\": {\n                    \"@type\": \"ImageObject\",\n                    \"url\": \"https://supertokens.com/static/assets/dark-home/logo.png\"\n                }\n            }\n        }</script>"
+    },
+    {
+        "path": "/blog/webauthin-api",
+        "metaTags": [
+            "<meta name=\"description\" content=\"Learn how the WebAuthn API enables passwordless, phishing-resistant login. Get step-by-step code and how to plug it into your auth stack.\" />",
+            "",
+            "<meta name=\"keywords\" content=\"Authentication, Open Source, Authorization, User Management, OAuth, Enterprise SSO, Security\" />",
+            "<!--OG Tags-->",
+            "<meta property=\"og:title\" content=\"What Is the WebAuthn API (and How to Use It in Your Auth Flow)\" />",
+            "<meta property=\"og:type\" content=\"article\" />",
+            "<meta property=\"og:url\" content=\"https://supertokens.com/blog/webauthin-api\" />",
+            "<meta property=\"og:description\" content=\"Learn how the WebAuthn API enables passwordless, phishing-resistant login. Get step-by-step code and how to plug it into your auth stack.\"/>",
+            "<meta property=\"og:image\" content=\"https://supertokens.com/blog-meta-images/webauthn_api.png\" />",
+            "",
+            "<meta name=\"twitter:card\" content=\"summary_large_image\" />",
+            "<meta name=\"twitter:title\" content=\"Learn how the WebAuthn API enables passwordless, phishing-resistant login. Get step-by-step code and how to plug it into your auth stack.\" />",
+            "<meta name=\"twitter:url\" content=\"https://supertokens.com/blog/webauthin-api\" />",
+            "<meta name=\"twitter:image\" content=\"https://supertokens.com/blog-meta-images/webauthn_api.png\" /> ",
+            "<!--OG Tags-->",
+            "<link rel=\"canonical\" href=\"https://supertokens.com/blog/webauthin-api\">"
+        ],
+        "title": "What Is the WebAuthn API (and How to Use It in Your Auth Flow)",
+        "schema": "<script type=\"application/ld+json\"> {\n            \"@context\": \"https://schema.org\",\n            \"@type\": \"Article\",\n            \"mainEntityOfPage\": {\n                \"@type\": \"WebPage\",\n                \"@id\": \"https://supertokens.com/blog/webauthin-api\"\n            },\n            \"headline\": \"Learn how the WebAuthn API enables passwordless, phishing-resistant login. Get step-by-step code and how to plug it into your auth stack.\",\n            \"image\": \"https://supertokens.com/blog-meta-images/webauthn_api.png\",\n            \"author\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"url\": \"https://supertokens.com\"\n            },\n            \"publisher\": {\n                \"@type\": \"Organization\",\n                \"name\": \"SuperTokens\",\n                \"logo\": {\n                    \"@type\": \"ImageObject\",\n                    \"url\": \"https://supertokens.com/static/assets/dark-home/logo.png\"\n                }\n            }\n        }</script>"
     }
 ]
