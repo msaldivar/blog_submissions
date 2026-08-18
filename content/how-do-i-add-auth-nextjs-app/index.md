@@ -56,3 +56,88 @@ Starting a project from scratch instead? `npx create-supertokens-app@latest` sca
 The other two are supporting cast. `supertokens-web-js` is the lower-level browser SDK that `supertokens-auth-react` builds on: npm pulls it in automatically as a peer dependency, but yarn and pnpm want it listed explicitly, and it's the package you'd reach for if you build a fully custom UI. `nextjs-cors` sets CORS headers on your API routes, which matters if your frontend and API ever live on different domains and costs nothing when they don't.
 
 In most stacks the backend and frontend SDKs live in separate repositories. Next.js is the exception: everything installs into one project, because the framework serves your React code and your API routes from the same codebase. Note what that command does not install: the SuperTokens core. The core is a standalone service, not an npm dependency. During development, the shared `try.supertokens.io` instance fills that role; in production, your connection URI points at a core you run in Docker or a managed instance.
+
+## How do I configure authentication on the backend?
+
+The backend in this case is not a separate server. It's three files inside your Next.js project, and the SuperTokens SDK does the heavy lifting in all of them.
+
+**First, the shared app info.** Both SDKs need to agree on where things live, so this config gets its own file:
+
+```ts
+// app/config/appInfo.ts
+export const appInfo = {
+  appName: 'my-next-app',
+  apiDomain: 'http://localhost:3000',
+  websiteDomain: 'http://localhost:3000',
+  apiBasePath: '/api/auth',
+  websiteBasePath: '/auth',
+}
+```
+
+One rule matters here: `apiBasePath` and `websiteBasePath` cannot be the same. Next.js serves your frontend and your API from one domain, and if both paths collide, routing breaks in ways that are annoying to debug.
+
+**Second, the backend config.** This is where you pick your auth method and connect to the core:
+
+```ts
+// app/config/backend.ts
+import SuperTokens from 'supertokens-node'
+import EmailPassword from 'supertokens-node/recipe/emailpassword'
+import Session from 'supertokens-node/recipe/session'
+import { TypeInput } from 'supertokens-node/types'
+import { appInfo } from './appInfo'
+
+export const backendConfig = (): TypeInput => ({
+  framework: 'custom',
+  supertokens: {
+    connectionURI: process.env.SUPERTOKENS_CONNECTION_URI!,
+    apiKey: process.env.SUPERTOKENS_API_KEY,
+  },
+  appInfo,
+  recipeList: [EmailPassword.init(), Session.init()],
+  isInServerlessEnv: true,
+})
+
+let initialized = false
+export function ensureSuperTokensInit() {
+  if (!initialized) {
+    SuperTokens.init(backendConfig())
+    initialized = true
+  }
+}
+```
+
+Recipes are how SuperTokens packages auth methods. `EmailPassword.init()` gives you credential-based signup and login. Prefer magic links or OTPs instead? Swap it for `Passwordless.init({ contactMethod: 'EMAIL', flowType: 'MAGIC_LINK' })` and nothing else in this file changes. `Session.init()` stays either way: recipes prove who the user is, sessions remember it.
+
+The other flags are Next.js survival gear. `framework: 'custom'` and `isInServerlessEnv: true` tell the SDK it's running in serverless functions rather than a long-lived Express server, and the `ensureSuperTokensInit` guard stops double initialization across cold starts and hot reloads.
+
+**Third, the catch-all route handler.** This single file mounts every auth endpoint:
+
+```ts
+// app/api/auth/[...path]/route.ts
+import { getAppDirRequestHandler } from 'supertokens-node/nextjs'
+import { NextRequest } from 'next/server'
+import { ensureSuperTokensInit } from '../../../config/backend'
+
+ensureSuperTokensInit()
+
+const handleCall = getAppDirRequestHandler()
+
+export async function GET(request: NextRequest) {
+  const res = await handleCall(request)
+  if (!res.headers.has('Cache-Control')) {
+    res.headers.set('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate')
+  }
+  return res
+}
+
+export async function POST(request: NextRequest) {
+  return handleCall(request)
+}
+
+// Export DELETE, PUT, PATCH, and HEAD the same way as POST.
+```
+
+Sign in, sign up, sign out, session refresh: all of them now exist under `/api/auth`, and you wrote none of them. The `Cache-Control` header is not optional decoration either. Vercel caches GET responses in production, and a cached session refresh will hand back stale tokens until your app is stuck in a 401 loop.
+
+That's the entire backend. `POST /api/auth/signup` already works; there's just no UI calling it yet.
+
