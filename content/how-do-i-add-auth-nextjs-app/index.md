@@ -220,5 +220,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 Backend and frontend now agree on paths, recipes, and sessions. What's missing is a page that actually renders the login form.
 
+## How do I add login and signup pages to my app?
+
+You don't build two pages. The prebuilt `SignInAndUp` component renders both forms and handles switching between them, so login and signup ship as one file:
+
+```tsx
+// app/auth/page.tsx
+'use client'
+import { SignInAndUp } from 'supertokens-auth-react/recipe/emailpassword/prebuiltui'
+
+export default function AuthPage() {
+  return <SignInAndUp />
+}
+```
+
+Placement is not a style choice. This page lives at `app/auth/page.tsx` because `/auth` is the `websiteBasePath` you set in `appInfo`, and the SDK routes through that path on its own. When an unauthenticated user hits a protected route, SuperTokens redirects them here without you writing a redirect. The `'use client'` directive stays, too: the prebuilt UI is browser-rendered React, and the App Router needs to be told.
+
+One tradeoff worth knowing. A single page at `/auth` covers login and signup, but the other prebuilt screens expect subroutes: password reset lives at `/auth/reset-password`, for example. If you want the full flow, replace this file with the catch-all routing page at `app/auth/[[...path]]/page.tsx` from the [SuperTokens docs](https://supertokens.com/docs), which serves every prebuilt screen under one path.
+
+The prebuilt UI is a starting point, not a cage. You can restyle it through theme config on the recipe init, override individual React components while keeping the form logic (swap the header, inject your own fields), or discard it entirely and build custom UI on `supertokens-web-js` against the same backend. Most teams ship the prebuilt version first and override incrementally.
+
+Run `npm run dev`, open `localhost:3000/auth`, and create an account. Signup works, login works, and a session now exists. Which raises the real question: how does the rest of your app know about it?
+
 ---
-**Section word count: 410 | Total word count: 1,708 / ~2,200**
+**Section word count: 275 | Total word count: 1,983 / ~2,200**
