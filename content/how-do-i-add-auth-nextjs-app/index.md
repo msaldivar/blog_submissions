@@ -297,3 +297,25 @@ The `loading` check is not ceremony. Session state starts unresolved on first re
 
 Keep the layers straight. Anyone with dev tools open can render your dashboard shell. What they can't do is make `withSession` hand over data without valid tokens. Guard the UI for experience; guard the API for real.
 
+## How do I test my Next.js app with authentication enabled?
+
+Start the dev server and walk the whole flow, including the parts that are supposed to fail:
+
+```bash
+npm run dev
+```
+
+1. **Sign up.** Open `localhost:3000/auth` and create an account. The prebuilt flow starts a session on signup, so you land back in the app already logged in. No separate login step needed.
+
+2. **Check the session exists.** Open dev tools and look at the cookies for `localhost:3000`. You'll find `sAccessToken` and `sRefreshToken`, set by the SDK without a line of cookie code on your side.
+
+3. **Visit the protected page.** Go to `/dashboard`. It renders your user ID. Hit `/api/dashboard` too: JSON with the same ID, verified server-side by `withSession`.
+
+4. **Test the failure path.** This is the check most people skip. Open an incognito window and go straight to `/dashboard`: you should bounce to `/auth`. Request `/api/dashboard` without cookies: 401. If either one lets you through, a guard is missing.
+
+5. **Confirm sessions run themselves.** Reload the page: still signed in. Leave the tab open past token expiry: the SDK refreshes access tokens in the background through `/api/auth/session/refresh`, and your only evidence is that nothing broke.
+
+To test logout, call `signOut()` from `supertokens-auth-react/recipe/session` behind a button, then confirm `/dashboard` bounces again.
+
+Five checks, all passing, and you wrote no login form, no auth endpoints, and no refresh logic.
+
