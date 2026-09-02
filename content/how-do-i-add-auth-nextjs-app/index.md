@@ -242,5 +242,58 @@ The prebuilt UI is a starting point, not a cage. You can restyle it through them
 
 Run `npm run dev`, open `localhost:3000/auth`, and create an account. Signup works, login works, and a session now exists. Which raises the real question: how does the rest of your app know about it?
 
----
-**Section word count: 275 | Total word count: 1,983 / ~2,200**
+## How do I protect pages with authentication?
+
+Protection happens in two places, and they do different jobs. The client-side guard controls what renders. The backend check controls what data leaves your server. You want both, because only one of them is a security boundary.
+
+**Backend routes: `withSession`.** Any route handler can demand a valid session before doing work. Here's an `/api/dashboard` endpoint that only answers to logged-in users:
+
+```ts
+// app/api/dashboard/route.ts
+import { NextRequest, NextResponse } from 'next/server'
+import { withSession } from 'supertokens-node/nextjs'
+import { ensureSuperTokensInit } from '../../config/backend'
+
+ensureSuperTokensInit()
+
+export function GET(request: NextRequest) {
+  return withSession(request, async (err, session) => {
+    if (err) {
+      return NextResponse.json(err, { status: 500 })
+    }
+    if (!session) {
+      return new NextResponse('Authentication required', { status: 401 })
+    }
+    return NextResponse.json({ userId: session.getUserId() })
+  })
+}
+```
+
+Three outcomes, handled in order: an SDK error, a missing or expired session, or a verified user. By the time your callback runs, the tokens are already validated, and `session.getUserId()` hands you the identity for database queries.
+
+**Client pages: `useSessionContext`.** For the `/dashboard` page itself, the session hook reads state from the `SuperTokensWrapper` you added earlier:
+
+```tsx
+// app/dashboard/page.tsx
+'use client'
+import { useSessionContext } from 'supertokens-auth-react/recipe/session'
+import { redirectToAuth } from 'supertokens-auth-react'
+
+export default function Dashboard() {
+  const session = useSessionContext()
+
+  if (session.loading) return null
+
+  if (!session.doesSessionExist) {
+    redirectToAuth()
+    return null
+  }
+
+  return <p>Signed in as {session.userId}</p>
+}
+```
+
+The `loading` check is not ceremony. Session state starts unresolved on first render, and TypeScript will correctly refuse to let you read `doesSessionExist` before you handle it. If you'd rather not hand-roll the redirect, wrap the page in `<SessionAuth>` from the same package and it manages both the loading state and the bounce to `/auth`.
+
+Keep the layers straight. Anyone with dev tools open can render your dashboard shell. What they can't do is make `withSession` hand over data without valid tokens. Guard the UI for experience; guard the API for real.
+
