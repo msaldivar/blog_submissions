@@ -141,3 +141,84 @@ Sign in, sign up, sign out, session refresh: all of them now exist under `/api/a
 
 That's the entire backend. `POST /api/auth/signup` already works; there's just no UI calling it yet.
 
+## How do I set up SuperTokens in the frontend?
+
+The frontend config is the mirror image of what you just wrote, with one Next.js-specific complication: `SuperTokens.init` can only run in the browser, and the App Router renders everything on the server first. Three files handle it.
+
+**The config function.** Same `appInfo`, same recipe pairing, plus a routing bridge:
+
+```tsx
+// app/config/frontend.tsx
+import EmailPasswordReact from 'supertokens-auth-react/recipe/emailpassword'
+import SessionReact from 'supertokens-auth-react/recipe/session'
+import { SuperTokensConfig } from 'supertokens-auth-react/lib/build/types'
+import { useRouter } from 'next/navigation'
+import { appInfo } from './appInfo'
+
+const routerInfo: { router?: ReturnType<typeof useRouter>; pathName?: string } = {}
+
+export function setRouter(router: ReturnType<typeof useRouter>, pathName: string) {
+  routerInfo.router = router
+  routerInfo.pathName = pathName
+}
+
+export const frontendConfig = (): SuperTokensConfig => ({
+  appInfo,
+  recipeList: [EmailPasswordReact.init(), SessionReact.init()],
+  windowHandler: (original) => ({
+    ...original,
+    location: {
+      ...original.location,
+      getPathName: () => routerInfo.pathName!,
+      assign: (url) => routerInfo.router!.push(url.toString()),
+      setHref: (url) => routerInfo.router!.push(url.toString()),
+    },
+  }),
+})
+```
+
+Importing the shared `appInfo` is how the frontend learns to send auth calls to `/api/auth`. The recipe list mirrors the backend: `EmailPasswordReact` renders the login UI, `SessionReact` tracks session state in the browser. Keep both sides matched. A frontend initialized with a recipe the backend never mounted will call endpoints that don't exist, and the resulting 404s won't explain themselves. The `windowHandler` block exists because SuperTokens redirects users after login with `window.location` by default, which triggers full page reloads. Bridging it to Next's router keeps navigation client-side.
+
+**The provider.** A client component that initializes the SDK exactly once, in the browser only:
+
+```tsx
+// app/components/supertokensProvider.tsx
+'use client'
+import React from 'react'
+import SuperTokensReact, { SuperTokensWrapper } from 'supertokens-auth-react'
+import { usePathname, useRouter } from 'next/navigation'
+import { frontendConfig, setRouter } from '../config/frontend'
+
+if (typeof window !== 'undefined') {
+  SuperTokensReact.init(frontendConfig())
+}
+
+export const SuperTokensProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
+  setRouter(useRouter(), usePathname() || window.location.pathname)
+  return <SuperTokensWrapper>{children}</SuperTokensWrapper>
+}
+```
+
+The `typeof window` check is doing real work. This module still gets evaluated during server rendering, and without the guard, `init` would run where no browser exists. `SuperTokensWrapper` is a React context provider: everything inside it can read session state.
+
+**The root layout.** Wrap once and every page inherits auth:
+
+```tsx
+// app/layout.tsx
+import { SuperTokensProvider } from './components/supertokensProvider'
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <SuperTokensProvider>
+        <body>{children}</body>
+      </SuperTokensProvider>
+    </html>
+  )
+}
+```
+
+Backend and frontend now agree on paths, recipes, and sessions. What's missing is a page that actually renders the login form.
+
+---
+**Section word count: 410 | Total word count: 1,708 / ~2,200**
