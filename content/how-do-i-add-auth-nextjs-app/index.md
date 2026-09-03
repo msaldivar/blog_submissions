@@ -331,3 +331,14 @@ The fair question after any tutorial. You just wired one framework into your app
 
 The tradeoffs are real. Self-hosting means the auth service is yours to keep healthy, and providers like Auth0 still win on enterprise feature breadth. But if you want auth that lives in your stack, on your terms, at a price that doesn't scale against your own growth, that's exactly the trade SuperTokens makes.
 
+## Where can I learn more about Next.js authentication with SuperTokens?
+
+Three places, depending on what you need next.
+
+For a deeper pass at the App Router specifically, read [Adding login to your Next.js app using the App Directory and SuperTokens](https://supertokens.com/blog/adding-login-to-your-nextjs-app-using-the-app-directory-and-supertokens). It walks the same integration with more attention to server components and session handling during SSR, which matters once your app leans hard on server rendering.
+
+The [SuperTokens docs](https://supertokens.com/docs) are where the recipes live. Passwordless flows, social login, MFA, UI overrides, self-hosting the core with Docker: each one builds on the config files you already have.
+
+And the [supertokens-core repo on GitHub](https://github.com/supertokens/supertokens-core) is the project itself. Read the source, file issues, or study the architecture before you self-host. Open source means the answer to "what does this actually do" lives in the code, not behind a support ticket.
+
+
