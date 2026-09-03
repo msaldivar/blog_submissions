@@ -319,3 +319,15 @@ To test logout, call `signOut()` from `supertokens-auth-react/recipe/session` be
 
 Five checks, all passing, and you wrote no login form, no auth endpoints, and no refresh logic.
 
+## Why should I use SuperTokens instead of other auth providers?
+
+The fair question after any tutorial. You just wired one framework into your app; here's why it was this one.
+
+**You own the stack.** SuperTokens is open source under Apache 2.0, and the core runs wherever you want it: a Docker container next to your app, your Kubernetes cluster, or their managed cloud when you'd rather not operate it. User data lives in your own PostgreSQL or MySQL database, which changes the exit math entirely. Leaving a managed provider means export tickets and password reset campaigns. Leaving SuperTokens means pointing something else at tables you already own. There's also no per-MAU pricing cliff waiting for you at scale.
+
+**Recipes cover the auth methods you'll actually ship.** Email password, passwordless OTPs and magic links, social and enterprise SSO, MFA: each is a recipe, and you've already seen what adopting one costs. Adding passwordless to this app is an edit to `recipeList` on each side, not a migration.
+
+**Extensibility is the default, not an enterprise tier.** Every API the SDK exposes can be overridden, so custom signup logic or extra validation slots in without forking anything. Plugins layer on cross-cutting concerns like CAPTCHA and rate limiting as installable units.
+
+The tradeoffs are real. Self-hosting means the auth service is yours to keep healthy, and providers like Auth0 still win on enterprise feature breadth. But if you want auth that lives in your stack, on your terms, at a price that doesn't scale against your own growth, that's exactly the trade SuperTokens makes.
+
