@@ -1,16 +1,13 @@
 ---
 title: How do I add authentication to a Next.js app with SuperTokens?
-description: "Learn how to add authentication to your Next.js app. Step-by-step guide on login, signup, and sessions with SuperTokens."
-date: "2026-09-27"
+description: "A step-by-step Next.js authentication guide: add login, signup, sessions, and protected pages to your app with SuperTokens."
+date: "2026-11-11"
 cover: "nextjs-supertokens-auth.png"
-category: "next.js, auth, guide"
+category: "programming, next.js, auth, guide"
 author: "Maurice Saldivar"
 ---
 
-
-# How do I add authentication to a Next.js application?
-
-Authentication is a solved problem in most frameworks. In Next.js it keeps getting re-solved, because the framework splits your application across more execution contexts than almost anything else in mainstream web development. Server components, client components, middleware, and route handlers all need to know who the user is, and each one reads cookies and validates sessions differently. A session hook that works in a client component won't run in a server component. Middleware defaults to the edge runtime, where plenty of Node libraries won't load. Layer in the App Router and Pages Router split, SSR hydration, and aggressive caching on platforms like Vercel, and "add a login page" quietly becomes an architecture decision.
+Authentication is a solved problem in most frameworks. In Next.js it keeps getting re-solved, because the framework splits your application across more execution contexts than almost anything else in mainstream web development. Server components, client components, middleware, and route handlers all need to know who the user is, and each one reads cookies and validates sessions differently. A session hook that works in a client component won't run in a server component. Middleware is a moving target: Next.js 16 renamed `middleware.ts` to `proxy.ts`, which runs on Node.js, while apps still on `middleware.ts` default to the edge runtime, where plenty of Node libraries won't load. Layer in the App Router and Pages Router split, SSR hydration, and aggressive caching on platforms like Vercel, and "add a login page" quietly becomes an architecture decision.
 
 You have three realistic paths. Build auth yourself and own token rotation, CSRF protection, and refresh logic forever. Hand it to a managed provider and accept per-user pricing and vendor lock-in. Or run an open source framework inside your own stack.
 
@@ -137,7 +134,7 @@ export async function POST(request: NextRequest) {
 // Export DELETE, PUT, PATCH, and HEAD the same way as POST.
 ```
 
-Sign in, sign up, sign out, session refresh: all of them now exist under `/api/auth`, and you wrote none of them. The `Cache-Control` header is not optional decoration either. Vercel caches GET responses in production, and a cached session refresh will hand back stale tokens until your app is stuck in a 401 loop.
+Sign in, sign up, sign out, session refresh: all of them now exist under `/api/auth`, and you wrote none of them. The `Cache-Control` header is not optional decoration either. Next.js route handlers and any CDN in front of your app can cache GET responses, and the SDK's GET endpoints answer per-user questions, like whether an email is verified. Without `no-store`, a cached copy can serve one user's stale auth state to the next request.
 
 That's the entire backend. `POST /api/auth/signup` already works; there's just no UI calling it yet.
 
@@ -222,21 +219,39 @@ Backend and frontend now agree on paths, recipes, and sessions. What's missing i
 
 ## How do I add login and signup pages to my app?
 
-You don't build two pages. The prebuilt `SignInAndUp` component renders both forms and handles switching between them, so login and signup ship as one file:
+You don't build two pages. One catch-all route renders every prebuilt screen, with login and signup sharing a single form that switches between them:
 
 ```tsx
-// app/auth/page.tsx
+// app/auth/[[...path]]/page.tsx
 'use client'
-import { SignInAndUp } from 'supertokens-auth-react/recipe/emailpassword/prebuiltui'
+import { useEffect, useState } from 'react'
+import { redirectToAuth } from 'supertokens-auth-react'
+import SuperTokens from 'supertokens-auth-react/ui'
+import { EmailPasswordPreBuiltUI } from 'supertokens-auth-react/recipe/emailpassword/prebuiltui'
 
-export default function AuthPage() {
-  return <SignInAndUp />
+export default function Auth() {
+  const [loaded, setLoaded] = useState(false)
+
+  useEffect(() => {
+    // Send paths no prebuilt screen handles (like /auth/random) back to login
+    if (SuperTokens.canHandleRoute([EmailPasswordPreBuiltUI]) === false) {
+      redirectToAuth({ redirectBack: false })
+    } else {
+      setLoaded(true)
+    }
+  }, [])
+
+  if (loaded) {
+    return SuperTokens.getRoutingComponent([EmailPasswordPreBuiltUI])
+  }
+
+  return null
 }
 ```
 
-Placement is not a style choice. This page lives at `app/auth/page.tsx` because `/auth` is the `websiteBasePath` you set in `appInfo`, and the SDK routes through that path on its own. When an unauthenticated user hits a protected route, SuperTokens redirects them here without you writing a redirect. The `'use client'` directive stays, too: the prebuilt UI is browser-rendered React, and the App Router needs to be told.
+The `[[...path]]` folder is an optional catch-all: it matches `/auth` itself and every path beneath it, so `/auth/reset-password` and the other prebuilt screens resolve to this one file. `canHandleRoute` checks whether the current URL belongs to a prebuilt screen, and `getRoutingComponent` renders the right one. The check runs inside `useEffect`, so any redirect happens after render, in the browser.
 
-One tradeoff worth knowing. A single page at `/auth` covers login and signup, but the other prebuilt screens expect subroutes: password reset lives at `/auth/reset-password`, for example. If you want the full flow, replace this file with the catch-all routing page at `app/auth/[[...path]]/page.tsx` from the [SuperTokens docs](https://supertokens.com/docs), which serves every prebuilt screen under one path.
+Placement is not a style choice. The route lives under `app/auth/` because `/auth` is the `websiteBasePath` you set in `appInfo`, and the SDK routes through that path on its own. When an unauthenticated user hits a protected route, SuperTokens redirects them here without you writing a redirect. The `'use client'` directive stays, too: the prebuilt UI is browser-rendered React, and the App Router needs to be told.
 
 The prebuilt UI is a starting point, not a cage. You can restyle it through theme config on the recipe init, override individual React components while keeping the form logic (swap the header, inject your own fields), or discard it entirely and build custom UI on `supertokens-web-js` against the same backend. Most teams ship the prebuilt version first and override incrementally.
 
@@ -271,29 +286,31 @@ export function GET(request: NextRequest) {
 
 Three outcomes, handled in order: an SDK error, a missing or expired session, or a verified user. By the time your callback runs, the tokens are already validated, and `session.getUserId()` hands you the identity for database queries.
 
-**Client pages: `useSessionContext`.** For the `/dashboard` page itself, the session hook reads state from the `SuperTokensWrapper` you added earlier:
+**Client pages: `SessionAuth`.** For the `/dashboard` page itself, wrap the content in `<SessionAuth>`. It waits for session state to load, sends signed-out visitors to `/auth`, and renders its children only when a session exists:
 
 ```tsx
 // app/dashboard/page.tsx
 'use client'
-import { useSessionContext } from 'supertokens-auth-react/recipe/session'
-import { redirectToAuth } from 'supertokens-auth-react'
+import { SessionAuth, useSessionContext } from 'supertokens-auth-react/recipe/session'
 
-export default function Dashboard() {
+function DashboardContent() {
   const session = useSessionContext()
 
   if (session.loading) return null
 
-  if (!session.doesSessionExist) {
-    redirectToAuth()
-    return null
-  }
-
   return <p>Signed in as {session.userId}</p>
+}
+
+export default function Dashboard() {
+  return (
+    <SessionAuth>
+      <DashboardContent />
+    </SessionAuth>
+  )
 }
 ```
 
-The `loading` check is not ceremony. Session state starts unresolved on first render, and TypeScript will correctly refuse to let you read `doesSessionExist` before you handle it. If you'd rather not hand-roll the redirect, wrap the page in `<SessionAuth>` from the same package and it manages both the loading state and the bounce to `/auth`.
+No redirect logic lives in your component. `SessionAuth` handles the bounce to `/auth`, and after login the user lands back on `/dashboard`. Inside it, `useSessionContext` reads the session from the `SuperTokensWrapper` you added earlier. The `loading` check is not ceremony: the hook's type includes an unresolved state, and TypeScript will correctly refuse to let you read `userId` until you rule it out.
 
 Keep the layers straight. Anyone with dev tools open can render your dashboard shell. What they can't do is make `withSession` hand over data without valid tokens. Guard the UI for experience; guard the API for real.
 
@@ -313,7 +330,7 @@ npm run dev
 
 4. **Test the failure path.** This is the check most people skip. Open an incognito window and go straight to `/dashboard`: you should bounce to `/auth`. Request `/api/dashboard` without cookies: 401. If either one lets you through, a guard is missing.
 
-5. **Confirm sessions run themselves.** Reload the page: still signed in. Leave the tab open past token expiry: the SDK refreshes access tokens in the background through `/api/auth/session/refresh`, and your only evidence is that nothing broke.
+5. **Confirm sessions run themselves.** Reload the page: still signed in. Then let the access token expire (an hour by default) and use the app again. Nothing refreshes in the background: on the first request after expiry, the SDK calls `/api/auth/session/refresh`, gets fresh tokens, and retries the original request transparently. Your only evidence is a refresh call in the network tab.
 
 To test logout, call `signOut()` from `supertokens-auth-react/recipe/session` behind a button, then confirm `/dashboard` bounces again.
 
@@ -323,19 +340,21 @@ Five checks, all passing, and you wrote no login form, no auth endpoints, and no
 
 The fair question after any tutorial. You just wired one framework into your app; here's why it was this one.
 
-**You own the stack.** SuperTokens is open source under Apache 2.0, and the core runs wherever you want it: a Docker container next to your app, your Kubernetes cluster, or their managed cloud when you'd rather not operate it. User data lives in your own PostgreSQL or MySQL database, which changes the exit math entirely. Leaving a managed provider means export tickets and password reset campaigns. Leaving SuperTokens means pointing something else at tables you already own. There's also no per-MAU pricing cliff waiting for you at scale.
+**You own the stack.** SuperTokens is open source under Apache 2.0, and the core runs wherever you want it: a Docker container next to your app, your Kubernetes cluster, or their managed cloud when you'd rather not operate it. User data lives in your own PostgreSQL or MySQL database, which changes the exit math entirely. Leaving a managed provider means export tickets and password reset campaigns. Leaving SuperTokens means pointing something else at tables you already own. On cost, self-hosting the open-source features is free with no MAU limits; the managed service is free up to 5,000 MAUs, then $0.02 per MAU, and paid add-ons like MFA are priced separately.
 
-**Recipes cover the auth methods you'll actually ship.** Email password, passwordless OTPs and magic links, social and enterprise SSO, MFA: each is a recipe, and you've already seen what adopting one costs. Adding passwordless to this app is an edit to `recipeList` on each side, not a migration.
+**Recipes cover the auth methods you'll actually ship.** Email password, passwordless OTPs and magic links, social login: each is a recipe, and you've already seen what adopting one costs. Adding passwordless to this app is an edit to `recipeList` on each side, not a migration. Enterprise SSO and [MFA](https://supertokens.com/blog/add-mfa-to-nextjs) plug in the same way, but they're paid add-ons rather than part of the free open-source set.
 
 **Extensibility is the default, not an enterprise tier.** Every API the SDK exposes can be overridden, so custom signup logic or extra validation slots in without forking anything. Plugins layer on cross-cutting concerns like CAPTCHA and rate limiting as installable units.
 
-The tradeoffs are real. Self-hosting means the auth service is yours to keep healthy, and providers like Auth0 still win on enterprise feature breadth. But if you want auth that lives in your stack, on your terms, at a price that doesn't scale against your own growth, that's exactly the trade SuperTokens makes.
+The tradeoffs are real. Self-hosting means the auth service is yours to keep healthy, and providers like Auth0 still win on enterprise feature breadth; our roundup of [NextAuth alternatives](https://supertokens.com/blog/nextauth-alternatives) compares the field side by side. But if you want auth that lives in your stack, on your terms, with core features that stay free to self-host as you grow, that's exactly the trade SuperTokens makes.
 
 ## Where can I learn more about Next.js authentication with SuperTokens?
 
-Three places, depending on what you need next.
+A few places, depending on what you need next.
 
 For a deeper pass at the App Router specifically, read [Adding login to your Next.js app using the App Directory and SuperTokens](https://supertokens.com/blog/adding-login-to-your-nextjs-app-using-the-app-directory-and-supertokens). It walks the same integration with more attention to server components and session handling during SSR, which matters once your app leans hard on server rendering.
+
+To extend the app you just built, [How to Implement Passkey Authentication in Next.js With SuperTokens](https://supertokens.com/blog/implement-passkeys-nextjs) adds passkeys on the same stack, and [Enhancing Your Next.js Application with Middleware](https://supertokens.com/blog/enhancing-your-nextjs-application-with-middleware) covers checking requests before a page renders. That post predates Next.js 16, where the `middleware.ts` file it describes is now `proxy.ts`.
 
 The [SuperTokens docs](https://supertokens.com/docs) are where the recipes live. Passwordless flows, social login, MFA, UI overrides, self-hosting the core with Docker: each one builds on the config files you already have.
 
