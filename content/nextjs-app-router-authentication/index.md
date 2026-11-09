@@ -1,18 +1,39 @@
 ---
-title: "Next.js App Router authentication complete guide"
+title: "Next.js App Router Authentication: The Complete Guide (2026)"
 description: "Learn how to secure Next.js App Router authentication after CVE-2025-29927, across Server Components, Server Actions, and Route Handlers, using SuperTokens."
-date: "2025-08-18"
+date: "2026-11-11"
 cover: "nextjs-app-router-auth-cover.png"
 category: "nextjs, authentication, guide"
 author: "Maurice Saldivar"
 ---
+## TL;DR
+
+- **Middleware, now called Proxy, is a fast first check, not a security boundary.** CVE-2025-29927 let one request header skip it entirely, five more advisories in 2026 found other ways around it, and any path outside its matcher skips it too.
+- **Put every read and write behind a Data Access Layer (DAL).** Each function checks the session against the database, so revoking a session or removing a role takes effect on the next request. Queries filter by the signed-in user, and only the fields the UI needs leave the module.
+- **Check inside every entry point, because each one is public.** Pages call `verifySession()` and redirect. Server Actions are POST endpoints, so they validate their input and go through the DAL. Route Handlers answer with `401` or `403`, never a redirect.
+- **Pair short-lived access tokens with single-use refresh tokens.** Keep both in `httpOnly`, `SameSite` cookies, and refresh under a cross-tab lock so two tabs don't look like token theft.
+- **Streaming locks the status code at `200`.** It goes out with the first Suspense fallback or Cache Components shell, so a real `307` has to come before that, from Proxy or from a page check with nothing suspended above it. Anything in the static shell reaches every visitor Proxy lets through.
+- **SuperTokens replaces the token code, not the architecture.** [The SuperTokens section](#implementing-this-with-supertokens) swaps in its SDK for the session lookup, Proxy's token check, and the refresh flow, and every check stays where it is.
+
+Here's the Next.js App Router authentication architecture this guide builds:
+
+![Layered defense for Next.js App Router authentication: Proxy checks the token's signature and expiry; each page checks the session again, and each Server Action and Route Handler validates its request before calling the DAL; the Data Access Layer verifies the session and role against the database; and queries for a user's own records filter by that user's ID. A request that skips Proxy or an entry point's check is still refused by the DAL.](./layered-defense.png "Four checks between a request and your data")
+
+## Table of Contents
+
+```toc:clipboard=false
+tight: true
+toHeading: 2
+exclude: ["Table of Contents", "TL;DR"]
+```
+
 ## Why App Router Changes Authentication
 
 In March 2025, the Next.js team disclosed [CVE-2025-29927](https://github.com/vercel/next.js/security/advisories/GHSA-f82v-jwr5-mffw), a critical (CVSS 9.1) authorization bypass in middleware. A request carrying one internal header, `x-middleware-subrequest`, set to the right value, skipped middleware entirely and went straight to the route behind it. Self-hosted apps from Next.js 11.1.4 onward were exposed until they upgraded to a fixed release.
 
 For any app that checked sessions in middleware and nowhere else, that header turned every protected route into a public one. The bug was in Next.js. How much it exposed came down to architecture.
 
-Middleware-only authentication is an easy design to fall into. One file sits in front of every route, runs before anything renders, and looks like a complete perimeter. It's also a single point of failure, and the App Router gives that single point more ground to cover. In the Pages Router, server code lived in a short list of places, mainly `getServerSideProps` and API routes. The App Router spreads it across the component tree. That's the real shift in Next.js App Router authentication: every place that runs server code needs its own check.
+Middleware-only authentication is an easy design to fall into. One file sits in front of every route, runs before anything renders, and looks like a complete perimeter. It's also a single point of failure, and the App Router gives that single point more ground to cover. In the Pages Router, server code lived in a short list of places, mainly `getServerSideProps` and [API routes](https://supertokens.com/blog/mastering-nextjs-api-routes). The App Router spreads it across the component tree. That's the real shift in Next.js App Router authentication: every place that runs server code needs its own check.
 
 ### Where Auth Checks Run
 
@@ -37,7 +58,7 @@ Each of these runs at a different moment, has different control over the respons
 
 The last two columns are where shared helpers break. Server Components can't set cookies, because HTTP can't add them once a response starts streaming, so a page that finds an expired access token can't refresh it in place. And a `verifySession()` helper that calls `redirect('/login')` is right for a page. In a Route Handler, the same helper answers a mobile client with a 307 redirect to an HTML login page instead of a 401 the client can act on.
 
-The runtime split made this worse. Until Next.js 15.2, middleware could only run on the Edge runtime, which supports a subset of Node.js APIs and rules out most traditional database drivers. A common result was a JWT signature check in middleware and a database-backed check, or none, everywhere else. Those two checks can disagree. A signature check can't see revocation, so a session you revoke after a password change keeps passing it until its access token expires.
+The runtime split made this worse. Until Next.js 15.2, middleware could only run on the Edge runtime, which supports a subset of Node.js APIs and rules out most traditional database drivers. A common result was a JWT signature check in middleware and a database-backed check, or none, everywhere else. Those two checks can disagree. A [signature check can't see revocation](https://supertokens.com/blog/revoking-access-with-a-jwt-blacklist), so a session you revoke after a password change keeps passing it until its access token expires.
 
 Proxy runs on Node.js in Next.js 16, but the Next.js authentication guide still limits it to reading the cookie, with no database calls, because it runs on every matched route, prefetches included. That split, a fast optimistic check up front and an authoritative check behind it, is the design Next.js recommends. What you control is whether every request path reaches the authoritative one.
 
@@ -896,7 +917,7 @@ Redirects are for people. Status codes are for everything else.
 
 ## Middleware at the Edge: What It's For and What It Isn't
 
-Next.js 16 moved middleware off the Edge runtime and renamed it Proxy. The [upgrade guide](https://nextjs.org/docs/app/guides/upgrading/version-16#middleware-to-proxy) says so in capitals: "The `edge` runtime is NOT supported in `proxy`." Apps that still want Edge can keep the deprecated `middleware.ts`. Either way, the job is the same, and the [Proxy docs](https://nextjs.org/docs/app/getting-started/proxy#use-cases) set its limit in one line: Proxy "should not be used as a full session management or authorization solution." This section covers what that leaves Proxy to do, and builds one that runs on both runtimes.
+Next.js 16 moved [middleware](https://supertokens.com/blog/enhancing-your-nextjs-application-with-middleware) off the Edge runtime and renamed it Proxy. The [upgrade guide](https://nextjs.org/docs/app/guides/upgrading/version-16#middleware-to-proxy) says so in capitals: "The `edge` runtime is NOT supported in `proxy`." Apps that still want Edge can keep the deprecated `middleware.ts`. Either way, the job is the same, and the [Proxy docs](https://nextjs.org/docs/app/getting-started/proxy#use-cases) set its limit in one line: Proxy "should not be used as a full session management or authorization solution." This section covers what that leaves Proxy to do, and builds one that runs on both runtimes.
 
 ### What a Token Check Can Know
 
@@ -1013,13 +1034,13 @@ Proxy can tell you a token is real. Only the DAL can tell you it still counts.
 
 ## Session and Token Strategy
 
-The DAL section assumed sign-in had already set a signed cookie with a session ID in it. This section builds that side. A session here is two tokens with two jobs. The access token is short-lived, and Proxy and the DAL verify it on every request. The refresh token is long-lived, goes to exactly one endpoint, and works exactly once.
+The DAL section assumed sign-in had already set a signed cookie with a session ID in it. This section builds that side. A session here is [two tokens with two jobs](https://supertokens.com/blog/all-you-need-to-know-about-user-session-security). The access token is short-lived, and Proxy and the DAL verify it on every request. The refresh token is long-lived, goes to exactly one endpoint, and works exactly once.
 
 ### Two Tokens, Two Jobs
 
 | | Access token | Refresh token |
 |---|---|---|
-| What it is | Signed JWT holding the session ID | 32 random bytes, stored only as a hash |
+| What it is | Signed [JWT](https://supertokens.com/blog/what-is-jwt) holding the session ID | 32 random bytes, stored only as a hash |
 | Lifetime | 15 minutes | Until the session goes idle or ends |
 | Cookie | `session`, `Path=/`, `SameSite=Lax` | `refresh`, `Path=/api/auth/refresh`, `SameSite=Strict` |
 | Read by | Proxy and the DAL | The refresh endpoint, nothing else |
@@ -1110,9 +1131,9 @@ Key implementation decisions:
 
 - **Three clocks, not one.** The access token lasts 15 minutes, the session ends after a week without a refresh, and it ends after 30 days no matter what. The [OWASP Session Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html) calls expiration timeouts "mandatory" for every session. Its examples run much shorter, with idle timeouts of 15 to 30 minutes for low-risk apps, so treat these numbers as product decisions, not defaults to copy.
 - **The cookies outlive the access token.** Both cookies expire with the refresh token. Until then, the browser keeps sending an expired but genuine access token, which is how Proxy knows to send the user to `/refresh` instead of `/login`. Once the idle timeout passes, both cookies are gone, and Proxy goes straight to `/login`.
-- **Refresh tokens are hashed and single-use.** Only a SHA-256 hash reaches the database, and the conditional update lets exactly one request spend a token. Any second use, whether a race or a stolen copy, revokes the whole session. That's the trade [RFC 9700](https://www.rfc-editor.org/rfc/rfc9700#section-4.14) describes for rotation: it "stops the attack at the cost of forcing the legitimate client to obtain a fresh authorization grant."
+- **Refresh tokens are hashed and single-use.** Only a SHA-256 hash reaches the database, and the conditional update lets exactly one request spend a token. Any second use, whether a race or a [stolen copy](https://supertokens.com/blog/the-best-way-to-securely-manage-user-sessions), revokes the whole session. That's the trade [RFC 9700](https://www.rfc-editor.org/rfc/rfc9700#section-4.14) describes for rotation: it "stops the attack at the cost of forcing the legitimate client to obtain a fresh authorization grant."
 - **The refresh cookie goes nowhere else.** `Path=/api/auth/refresh` keeps it off page loads, API calls, and Proxy, in line with OWASP's advice to set the path "as restrictive as possible." `SameSite=Strict` keeps it off any request another site starts. The session cookie stays `Lax`, so a link from an email still arrives signed in. Set `SameSite` explicitly either way: [MDN notes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie) that browsers applying `Lax` by default still send cookies on POSTs for two minutes after they're set.
-- **Every sign-in gets a new session.** `createSession()` never reuses an ID. That covers OWASP's rule that the session ID "must be renewed or regenerated" after a privilege change like signing in, the standard defense against session fixation.
+- **Every sign-in gets a new session.** `createSession()` never reuses an ID. That covers OWASP's rule that the session ID "must be renewed or regenerated" after a privilege change like signing in, the standard defense against [session fixation](https://supertokens.com/blog/session-hijacking-fixation).
 
 ### The Refresh Endpoint
 
@@ -1211,6 +1232,8 @@ export function RefreshSession() {
 `app/refresh/page.tsx` just renders `<RefreshSession />`. With the lock in place, the same three tabs refreshed one after another, `204`, `204`, `204`. Each tab waited its turn, then spent the token the tab before it had just received, and all three landed back on the invoices page still signed in. The `next` check sent `//evil.example/steal` and `https://evil.example/x` to `/`, and a page load with no refresh cookie ended at `/login?next=%2Fdashboard%2Finvoices`.
 
 `apiFetch()` handles API calls the same way: the `invalid_token` challenge that Proxy and the Route Handlers send for an expired token triggers one refresh and one retry. A page that needs to refresh in place, the case from the Server Components section, can call `refreshSession()` and then `router.refresh()`.
+
+> **Rather not maintain the token code?** Rotation, reuse detection, the refresh endpoint, and the cross-tab lock are the parts of this section that are easiest to get subtly wrong. [SuperTokens session management](https://supertokens.com/docs/post-authentication/session-management/introduction) covers all four, and it's open source, so you can self-host the core or use the managed service. The [SuperTokens section](#implementing-this-with-supertokens) shows what changes: `readSession()` and Proxy's token check get new bodies, and `lib/auth/tokens.ts`, the refresh endpoint, and most of the client refresh code go away.
 
 An expired token should cost a round trip, not a sign-in.
 
@@ -1362,7 +1385,7 @@ Here's how the session strategy section's pieces map:
 
 One cell looks weaker than it is. SuperTokens sets both cookies from one `cookieSameSite` value, `Lax` by default when the site and API share a domain, so the refresh cookie isn't `Strict`. But its refresh API only answers `POST`, and browsers don't send a `Lax` cookie with a POST another site starts.
 
-The setup comes from SuperTokens' [App Router guide](https://supertokens.com/docs/integrations/nextjs/app-directory/about): config files, a provider in the root layout, the sign-in UI at `/auth`, and the auth API at `app/api/auth/[[...path]]/route.ts`. Two settings tie it to this architecture. Set `apiBasePath: '/api/auth'` in `appInfo` to match that route, which also keeps every SuperTokens API under the prefix Proxy already treats as public. And add `UserRoles.init()` to the backend recipe list, because the DAL reads roles from the core. The code below ran on supertokens-node 24.0.3 and supertokens-auth-react 0.51.3 against a self-hosted core 12.3.1, with access tokens cut to 20 seconds so they'd expire mid-test.
+The setup comes from SuperTokens' [App Router guide](https://supertokens.com/docs/integrations/nextjs/app-directory/about): config files, a provider in the root layout, the sign-in UI at `/auth`, and the auth API at `app/api/auth/[[...path]]/route.ts`. [Adding login to your Next.js app with SuperTokens](https://supertokens.com/blog/adding-login-to-your-nextjs-app-using-the-app-directory-and-supertokens) walks through an earlier version of this setup one file at a time. It was written for older SDKs, so take the recipe imports from SuperTokens' current guide. Two settings tie the setup to this architecture. Set `apiBasePath: '/api/auth'` in `appInfo` to match that route, which also keeps every SuperTokens API under the prefix Proxy already treats as public. And add `UserRoles.init()` to the backend recipe list, because the DAL reads roles from the core. The code below ran on supertokens-node 24.0.3 and supertokens-auth-react 0.51.3 against a self-hosted core 12.3.1, with access tokens cut to 20 seconds so they'd expire mid-test.
 
 ### A New Body for readSession()
 
@@ -1582,6 +1605,8 @@ The delete button then calls `useActionState(withRefresh(deleteInvoiceAction), n
 | Old refresh token replayed | `401`, "token theft detected", session revoked |
 | Member and admin on the streaming dashboard | Same as before: the overdue count for the admin only |
 
+To put this in your own app, start with SuperTokens' [Next.js App Router integration guide](https://supertokens.com/docs/integrations/nextjs/app-directory/about) for the config files and auth routes, and add `UserRoles.init()` to the backend recipe list. Then work through this section's code: the new `readSession()` body, Proxy's token check, the `/refresh` page, the `redirectToPath` check, and `withRefresh()` for Server Actions. To run the core yourself, follow the [self-hosting guide](https://supertokens.com/docs/deployment/self-host-supertokens). For a second factor, see [how to add MFA to Next.js with SuperTokens](https://supertokens.com/blog/add-mfa-to-nextjs).
+
 Let SuperTokens own the tokens. Keep the checks in your DAL.
 
 ## FAQ
@@ -1624,7 +1649,7 @@ It changes where checks can run. With it on, reading cookies outside a Suspense 
 
 ### Should Session Tokens Go in Cookies or localStorage?
 
-In a browser, `httpOnly` cookies. Anything in `localStorage` is readable by every script on the page, so one XSS bug hands over the session. OWASP's [HTML5 Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/HTML5_Security_Cheat_Sheet.html) is direct about it: "Do not store session identifiers in local storage as the data is always accessible by JavaScript." Cookies bring CSRF into play, which `SameSite`, Next.js's `Origin` check on Server Actions, and the `Origin` check from the Route Handler section cover. Mobile apps are the exception: they keep tokens in the Keychain or Keystore and send them as bearer tokens.
+In a browser, [`httpOnly` cookies](https://supertokens.com/blog/cookies-vs-localstorage-for-sessions-everything-you-need-to-know). Anything in `localStorage` is readable by every script on the page, so one XSS bug hands over the session. OWASP's [HTML5 Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/HTML5_Security_Cheat_Sheet.html) is direct about it: "Do not store session identifiers in local storage as the data is always accessible by JavaScript." Cookies bring CSRF into play, which `SameSite`, Next.js's `Origin` check on Server Actions, and the `Origin` check from the Route Handler section cover. Mobile apps are the exception: they keep tokens in the Keychain or Keystore and send them as bearer tokens.
 
 ### How Long Should Access Tokens Live?
 
